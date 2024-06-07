@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "712442858923",
+    "project_id": "multivendorbluekite",
+    "storage_bucket": "multivendorbluekite.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:712442858923:android:ae2e96919d0a269da716ee",
+        "android_client_info": {
+          "package_name": "com.bluekiteapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnL-aLEttEHRiTsAxg_19bvqbZwA1lmes"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

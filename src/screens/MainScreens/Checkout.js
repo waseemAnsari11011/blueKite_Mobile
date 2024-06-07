@@ -1,0 +1,399 @@
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, SafeAreaView, Dimensions, FlatList, Image } from 'react-native';
+import AddressTypeSelector from '../../components/SelectAddress';
+import Icon from '../../components/Icons/Icon';
+import StickyButton from '../../components/stickyBottomCartBtn';
+import StickyProceedButton from '../../components/StickyProceed';
+import { useDispatch, useSelector } from 'react-redux';
+import api, { baseURL } from '../../utils/api';
+import calculateDiscountedPrice from '../../utils/calculateDiscountedPrice';
+import QuantityUpdater from '../../components/QuantityUpdater';
+import { clearCart } from '../../config/redux/actions/cartActions';
+import Loading from '../../components/Loading';
+
+const windowWidth = Dimensions.get('window').width;
+
+const CheckoutScreen = ({ navigation }) => {
+    const dispatch = useDispatch()
+    const { data } = useSelector(state => state?.local);
+    const { cartItems } = useSelector(state => state.cart);
+    const subtotalPrice = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0)
+    const [loading, setloading] = useState(false)
+
+    const placeOrder = async (orderData) => {
+        try {
+            const response = await api.post('/order', orderData);
+
+
+            return response.data;
+        } catch (error) {
+            console.error('Error placing order:', error.message);
+            throw error;
+        }
+    };
+
+
+    const handlePlaceOrder = () => {
+        setloading(true)
+        const orderData = {
+            customer: data?.user?._id, // Replace with actual customer ID
+            vendors: [],
+            shippingAddress: data?.user?.shippingAddresses
+        };
+
+        // Group products by vendor
+        const vendorMap = {};
+
+        cartItems.forEach(item => {
+            if (!vendorMap[item.vendor]) {
+                vendorMap[item.vendor] = {
+                    vendor: item.vendor,
+                    products: [],
+                    orderStatus: "Pending"
+                };
+            }
+            vendorMap[item.vendor].products.push({
+                product: item._id,
+                quantity: item.quantity,
+                price: item.price,
+                discount: item.discount
+            });
+        });
+
+        // Convert vendorMap to an array
+        orderData.vendors = Object.values(vendorMap);
+
+        console.log("orderData--->>>", orderData)
+
+        placeOrder(orderData)
+            .then(savedOrder => {
+                setloading(false)
+                dispatch(clearCart())
+                navigation.navigate('Home')
+
+            })
+            .catch(error => {
+                // Handle error
+                setloading(false)
+            }).finally((f) => {
+                setloading(false)
+            })
+    }
+
+
+    const renderCartItem = ({ item, index }) => {
+        return (
+            <View style={[summarystyles.cartItem, cartItems.length - 1 === index && { marginBottom: 15 }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {item?.images?.length === 0 && <Image
+                        source={{ uri: `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM4sEG5g9GFcy4SUxbzWNzUTf1jMISTDZrTw&s` }} // Replace with your image url
+                        style={summarystyles.productImage}
+                    />}
+                    {item?.images?.length !== 0 && <Image source={{ uri: `${baseURL}${item?.images[0]}` }} style={summarystyles.productImage} />}
+                    <View style={summarystyles.detailsContainer}>
+                        <Text style={summarystyles.productName}>{item.name}</Text>
+                        {/* <Text style={summarystyles.productWeight}>100 g</Text> */}
+                        <View style={summarystyles.priceContainer}>
+                            <Text style={summarystyles.discountedPrice}>₹{calculateDiscountedPrice(item.price, item.discount)}</Text>
+                            <Text style={summarystyles.originalPrice}>₹{item.price}</Text>
+                        </View>
+                        <Text style={summarystyles.discountPercentage}>-{item.discount}%</Text>
+
+                    </View>
+                </View>
+
+            </View>
+        );
+    };
+
+    const renderHeader = () => (
+        <View style={{ padding: 15 }}>
+            <View style={[styles.cardcontainer,]}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Text style={styles.header}>Shipping Address</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => navigation.navigate('Add Location', { isCheckOut: true })}>
+                        <Icon.AntDesign name="edit" size={20} color={'green'} />
+                    </TouchableOpacity>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 15, borderTopWidth: 0.8, borderTopColor: 'grey', paddingTop: 10 }}>
+                    <Icon.Ionicons name="location" size={25} color={'green'} />
+                    <Text style={styles.addressContent}>{data?.user?.shippingAddresses?.address}</Text>
+                </View>
+            </View>
+            <View style={{ marginTop: 22, paddingBottom: 0, marginBottom: 10, }}>
+                <Text style={{ fontSize: 15, fontWeight: '600', color: 'black' }}>
+                    Order Summary
+                </Text>
+            </View>
+        </View>
+    );
+
+    const renderFooter = () => {
+        // Calculate the subtotal
+        const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+        // Calculate the total discount
+        const totalDiscount = cartItems.reduce((acc, item) => acc + (item.price * (item.discount / 100)) * item.quantity, 0);
+
+        // Define the shipping fee (assuming a constant value)
+        const shippingFee = 0.00;
+
+        // Define the tax (assuming no tax for simplicity)
+        const tax = 0.00;
+
+        // Calculate the total
+        const total = subtotal + shippingFee + tax - totalDiscount;
+
+        return (
+            <View style={footerStyles.container}>
+                <View style={footerStyles.row}>
+                    <Text style={footerStyles.label}>Sub Total({cartItems.length} items)</Text>
+                    <Text style={footerStyles.value}>₹{subtotal.toFixed(2)}</Text>
+                </View>
+                <View style={footerStyles.row}>
+                    <Text style={footerStyles.label}>Shipping Fee</Text>
+                    <Text style={footerStyles.value}>₹{shippingFee.toFixed(2)}</Text>
+                </View>
+                <View style={footerStyles.row}>
+                    <Text style={footerStyles.label}>Discount</Text>
+                    <Text style={footerStyles.value}>₹{totalDiscount.toFixed(2)}</Text>
+                </View>
+                <View style={footerStyles.row}>
+                    <Text style={footerStyles.label}>Tax</Text>
+                    <Text style={footerStyles.value}>₹{tax.toFixed(2)}</Text>
+                </View>
+                <View style={[footerStyles.row, footerStyles.totalRow]}>
+                    <Text style={footerStyles.label}>Total</Text>
+                    <Text style={footerStyles.value}>₹{total.toFixed(2)}</Text>
+                </View>
+            </View>
+        );
+    }
+
+
+
+    return (
+        <>
+            {loading && <Loading />}
+            <FlatList
+                data={cartItems}
+                renderItem={renderCartItem}
+                keyExtractor={(item, index) => index.toString()}
+                ListHeaderComponent={renderHeader}
+                ListFooterComponent={renderFooter}
+            />
+            <StickyProceedButton navigation={navigation} PlaceOrderFunc={handlePlaceOrder} />
+        </>
+
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: "#F0F8FF50",
+        paddingBottom: 100
+    },
+    header: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: 'black',
+        marginLeft: 5
+    },
+    cardcontainer: {
+        padding: 20,
+        margin: 5,
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 5,
+        marginTop: 0
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        padding: 8,
+        marginBottom: 16,
+    },
+    addButton: {
+        backgroundColor: 'green',
+        padding: 12,
+        alignItems: 'center',
+        borderRadius: 8,
+        position: "absolute",
+        bottom: 0
+    },
+    addButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    addressContent: {
+        width: windowWidth - 100,
+        marginLeft: 10,
+        fontWeight: "500"
+    }
+});
+
+const footerStyles = StyleSheet.create({
+    container: {
+        marginBottom: 150,
+        paddingHorizontal: 15,
+    },
+    row: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+    },
+    label: {
+        fontSize: 15,
+        color: 'grey',
+    },
+    value: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: 'black',
+    },
+    totalRow: {
+        borderTopWidth: 1,
+        borderTopColor: 'grey',
+        paddingTop: 10,
+    },
+});
+
+const summarystyles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#F0F8FF50',
+
+    },
+    cartList: {
+        flex: 1,
+        // alignItems: 'center',
+    },
+    cartItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+        backgroundColor: 'white'
+    },
+    title: {
+        fontWeight: 'bold',
+        color: 'black',
+        fontSize: 18
+    },
+    price: {
+        marginTop: 10,
+        fontSize: 15,
+        fontWeight: '700',
+    },
+    quantity: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginRight: 20,
+    },
+    button: {
+        backgroundColor: '#ddd',
+        borderRadius: 20,
+        width: 30,
+    },
+    buttonText: {
+        fontSize: 20,
+        textAlign: 'center',
+    },
+    quantityText: {
+        fontSize: 16,
+        marginHorizontal: 10,
+    },
+    totalContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginVertical: 20,
+    },
+    totalText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    totalPrice: {
+        fontSize: 20,
+    },
+    placeOrderButton: {
+        backgroundColor: '#1abc9c',
+        borderRadius: 10,
+        paddingVertical: 15,
+    },
+    placeOrderButtonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    emptyCart: {
+        flex: 1,
+        backgroundColor: 'white',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    emptyCartText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    detailsContainer: {
+        flex: 1,
+    },
+    productName: {
+        fontWeight: 'bold',
+        color: 'black',
+        fontSize: 13
+    },
+    productWeight: {
+        color: '#666',
+        fontSize: 13
+    },
+    priceContainer: {
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        marginTop: 7
+    },
+    discountedPrice: {
+        color: 'red',
+        fontWeight: 'bold',
+        fontSize: 15,
+    },
+    originalPrice: {
+        textDecorationLine: 'line-through',
+        marginLeft: 8,
+        fontSize: 15
+    },
+    discountPercentage: {
+        color: 'green',
+        marginTop: 2,
+        fontSize: 15
+    },
+    addContainer: {
+        flexDirection: "row-reverse",
+    },
+
+    addButtonText: {
+        color: '#fff',
+    },
+    callIconContainer: {
+        // Style for your call icon container
+    },
+    productImage: {
+        width: windowWidth / 3,
+        height: windowWidth / 3,
+        marginRight: 15,
+        resizeMode: "contain"
+    }
+});
+
+export default CheckoutScreen;
