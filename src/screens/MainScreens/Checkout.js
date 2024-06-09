@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, SafeAreaView, Dimensions, FlatList, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, SafeAreaView, Dimensions, FlatList, Image, Alert } from 'react-native';
 import AddressTypeSelector from '../../components/SelectAddress';
 import Icon from '../../components/Icons/Icon';
 import StickyButton from '../../components/stickyBottomCartBtn';
@@ -10,6 +10,8 @@ import calculateDiscountedPrice from '../../utils/calculateDiscountedPrice';
 import QuantityUpdater from '../../components/QuantityUpdater';
 import { clearCart } from '../../config/redux/actions/cartActions';
 import Loading from '../../components/Loading';
+import RazorpayCheckout from 'react-native-razorpay';
+import { RadioButton } from 'react-native-paper';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -19,6 +21,7 @@ const CheckoutScreen = ({ navigation }) => {
     const { cartItems } = useSelector(state => state.cart);
     const subtotalPrice = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0)
     const [loading, setloading] = useState(false)
+    const [paymentMethod, setPaymentMethod] = useState('online');
 
     const placeOrder = async (orderData) => {
         try {
@@ -32,8 +35,19 @@ const CheckoutScreen = ({ navigation }) => {
         }
     };
 
+    const placeOrderRazorPay = async (orderData) => {
+        try {
+            const response = await api.post('/razorpay', orderData);
 
-    const handlePlaceOrder = () => {
+            return response.data;
+        } catch (error) {
+            console.error('Error placing order:', error.message);
+            throw error;
+        }
+    };
+
+
+    const handlePlaceOrderCod = () => {
         setloading(true)
         const orderData = {
             customer: data?.user?._id, // Replace with actual customer ID
@@ -63,10 +77,117 @@ const CheckoutScreen = ({ navigation }) => {
         // Convert vendorMap to an array
         orderData.vendors = Object.values(vendorMap);
 
-        console.log("orderData--->>>", orderData)
 
         placeOrder(orderData)
             .then(savedOrder => {
+                setloading(false)
+                dispatch(clearCart())
+                navigation.navigate('Home')
+
+            })
+            .catch(error => {
+                console.log("error---->>>", error.message)
+                alert(error.message)
+                // Handle error
+                setloading(false)
+            }).finally((f) => {
+                setloading(false)
+            })
+    }
+
+
+    const handlePlaceOrderRazorpay = () => {
+        setloading(true)
+        const orderData = {
+            customer: data?.user?._id, // Replace with actual customer ID
+            vendors: [],
+            shippingAddress: data?.user?.shippingAddresses
+        };
+
+        // Group products by vendor
+        const vendorMap = {};
+
+        cartItems.forEach(item => {
+            if (!vendorMap[item.vendor]) {
+                vendorMap[item.vendor] = {
+                    vendor: item.vendor,
+                    products: [],
+                    orderStatus: "Pending"
+                };
+            }
+            vendorMap[item.vendor].products.push({
+                product: item._id,
+                quantity: item.quantity,
+                price: item.price,
+                discount: item.discount
+            });
+        });
+
+        // Convert vendorMap to an array
+        orderData.vendors = Object.values(vendorMap);
+
+        placeOrderRazorPay(orderData)
+            .then(savedOrder => {
+
+                const { order, razorpayOrder } = savedOrder;
+
+                const options = {
+                    description: 'Payment for Order',
+                    image: 'https://i.imgur.com/3g7nmJC.png',
+                    currency: razorpayOrder.currency,
+                    key: 'rzp_test_nEIzO6bfk1HLkL', // Your Razorpay API key
+                    amount: razorpayOrder.amount,
+                    name: 'Blue Kite',
+                    order_id: razorpayOrder.id, // Razorpay order ID
+                    prefill: {
+                        email: 'email@example.com',
+                        contact: '9191919191',
+                        name: 'React Native Developer'
+                    },
+                    theme: { color: '#F37254' }
+                };
+
+                RazorpayCheckout.open(options)
+                    .then(async paymentSuccess => {
+                        Alert.alert('Payment Successful', `Payment ID: ${paymentSuccess.razorpay_payment_id}`);
+                        // await fetch('http://your-backend-url/update-payment-status', {
+                        //     method: 'POST',
+                        //     headers: {
+                        //         'Content-Type': 'application/json'
+                        //     },
+                        //     body: JSON.stringify({
+                        //         orderId: order._id,
+                        //         paymentId: paymentSuccess.razorpay_payment_id,
+                        //         status: 'success'
+                        //     })
+                        // });
+
+                        console.log("paymentSuccess-->>", paymentSuccess)
+
+                        const verifyBody = {
+                            "orderId": order._id,
+                            "razorpay_payment_id": paymentSuccess.razorpay_payment_id,
+                            "razorpay_order_id": razorpayOrder.id,
+                            "razorpay_signature": paymentSuccess.razorpay_signature
+                        }
+                        const response = await api.post('/razorpay-verify-payment', verifyBody);
+                    })
+                    .catch(async paymentError => {
+                        Alert.alert('Payment Failed', `Error: ${paymentError.description}`);
+                        await api.post('/razorpay-verify-payment', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                orderId: order._id,
+                                paymentId: null,
+                                status: 'failed'
+                            })
+                        });
+                    });
+
+
                 setloading(false)
                 dispatch(clearCart())
                 navigation.navigate('Home')
@@ -79,6 +200,14 @@ const CheckoutScreen = ({ navigation }) => {
                 setloading(false)
             })
     }
+
+    const handlePlaceOrder = () => {
+        if (paymentMethod === 'online') {
+            handlePlaceOrderRazorpay();
+        } else {
+            handlePlaceOrderCod();
+        }
+    };
 
 
     const renderCartItem = ({ item, index }) => {
@@ -177,6 +306,19 @@ const CheckoutScreen = ({ navigation }) => {
     return (
         <>
             {loading && <Loading />}
+            <View style={{ padding: 16 }}>
+                <Text>Select Payment Method:</Text>
+                <RadioButton.Group onValueChange={value => setPaymentMethod(value)} value={paymentMethod}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <RadioButton value="online" />
+                        <Text>Online Payment</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <RadioButton value="cod" />
+                        <Text>Cash on Delivery (COD)</Text>
+                    </View>
+                </RadioButton.Group>
+            </View>
             <FlatList
                 data={cartItems}
                 renderItem={renderCartItem}
@@ -184,6 +326,7 @@ const CheckoutScreen = ({ navigation }) => {
                 ListHeaderComponent={renderHeader}
                 ListFooterComponent={renderFooter}
             />
+            
             <StickyProceedButton navigation={navigation} PlaceOrderFunc={handlePlaceOrder} />
         </>
 

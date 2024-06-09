@@ -10,6 +10,7 @@ import categoryReducer from './categoryReducer';
 import discountedProductsReducer from './discountedProductsReducers';
 import searchReducer from './searchReducer';
 import ordersReducer from './orderReducer';
+import inquiryReducer from './inquiryReducer';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -20,9 +21,10 @@ const rootReducer = combineReducers({
   categoryProducts: productsByCategoryReducer,
   recentlyAddedProducts: recentlyAddedProductsReducer,
   categories: categoryReducer,
-  discountedProducts:discountedProductsReducer,
+  discountedProducts: discountedProductsReducer,
   search: searchReducer,
-  orders:ordersReducer
+  orders: ordersReducer,
+  inquiry: inquiryReducer
 });
 
 export default rootReducer;

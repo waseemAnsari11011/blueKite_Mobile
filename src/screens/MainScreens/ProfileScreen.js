@@ -162,14 +162,14 @@ const ProfileScreen = ({ navigation }) => {
       </TouchableOpacity>
       <View style={styles.borderBottom}></View>
       <TouchableOpacity
-        onPress={() => navigation.navigate('otp')}
+        onPress={() => navigation.navigate('Submit Inquiry')}
         style={styles.itemContainer}>
         <View style={styles.itemSubContainer}>
           <Image
             style={styles.itemImage}
             source={require('../../assets/images/profile.png')}
           />
-          <Text style={styles.itemTitle}>My profile</Text>
+          <Text style={styles.itemTitle}>Inquiries</Text>
         </View>
         <AntDesign name="right" style={{ color: `green` }} size={20} />
       </TouchableOpacity>
