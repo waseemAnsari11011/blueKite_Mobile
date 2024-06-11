@@ -13,6 +13,7 @@ import ordersReducer from './orderReducer';
 import inquiryReducer from './inquiryReducer';
 import faqReducer from './faqReducer';
 import contactReducer from './contactReducer';
+import customerReducer from './customerReducer';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -28,7 +29,8 @@ const rootReducer = combineReducers({
   orders: ordersReducer,
   inquiry: inquiryReducer,
   faq: faqReducer,
-  contact: contactReducer
+  contact: contactReducer,
+  customer: customerReducer
 });
 
 export default rootReducer;
