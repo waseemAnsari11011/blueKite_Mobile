@@ -13,7 +13,7 @@ import CheckoutScreen from '../screens/MainScreens/Checkout';
 import DiscountedProducts from '../screens/MainScreens/DiscountedProducts';
 import RecentlyAddedProducts from '../screens/MainScreens/RecentlyAddedProducts';
 import SearchScreen from '../screens/MainScreens/Search';
-import LocationSearch from '../screens/MainScreens/LocationSearch';
+import LocationSearch from '../screens/MainScreens/location/LocationSearch';
 import PhoneSignIn from '../screens/PhoneSignIn';
 import { useSelector } from 'react-redux';
 import OrderTacking from '../screens/MainScreens/orders/OrderTacking';

@@ -1,20 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Switch, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Switch, TouchableOpacity } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Icon from 'react-native-vector-icons/Ionicons'; // Assume using Ionicons from react-native-vector-icons
-import ButtonComponent from '../../components/Button';
-import { loadData, saveData } from '../../config/redux/actions/storageActions';
 import { useDispatch, useSelector } from 'react-redux';
-import api from '../../utils/api';
+import ManualLocationSearch from './ManualLocationSearch'; // Import the new component
+import ButtonComponent from '../../../components/Button';
+import api from '../../../utils/api';
+import { loadData, saveData } from '../../../config/redux/actions/storageActions';
+import { GOOGLE_API_KEY } from '@env';
 
-const GOOGLE_PLACES_API_KEY = 'AIzaSyA7_-ti7wWjitTNFUVP2VGrrVkfffulY4A';
+const GOOGLE_PLACES_API_KEY = GOOGLE_API_KEY;
 
 const LocationSearch = ({ navigation, route }) => {
   console.log("route.params.isCheckout--->>>", route?.params?.isCheckOut)
   const dispatch = useDispatch()
   const { data } = useSelector(state => state?.local);
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const [manualInput, setManualInput] = useState(false);
+  const [manualInput, setManualInput] = useState(true);
   const [manualLocation, setManualLocation] = useState({
     description: '',
     pincode: '',
@@ -152,38 +154,10 @@ const LocationSearch = ({ navigation, route }) => {
           )}
         />
       ) : (
-        <ScrollView style={styles.manualInputContainer}>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Description"
-            value={manualLocation.description}
-            onChangeText={(text) => handleManualLocationChange('description', text)}
-          />
-          <TextInput
-            style={styles.textInput}
-            placeholder="City"
-            value={manualLocation.city}
-            onChangeText={(text) => handleManualLocationChange('city', text)}
-          />
-          <TextInput
-            style={styles.textInput}
-            placeholder="State"
-            value={manualLocation.state}
-            onChangeText={(text) => handleManualLocationChange('state', text)}
-          />
-          <TextInput
-            style={styles.textInput}
-            placeholder="Country"
-            value={manualLocation.country}
-            onChangeText={(text) => handleManualLocationChange('country', text)}
-          />
-          <TextInput
-            style={styles.textInput}
-            placeholder="Pincode"
-            value={manualLocation.pincode}
-            onChangeText={(text) => handleManualLocationChange('pincode', text)}
-          />
-        </ScrollView>
+        <ManualLocationSearch 
+          manualLocation={manualLocation} 
+          handleManualLocationChange={handleManualLocationChange} 
+        />
       )}
       {(selectedLocation || (manualInput && manualLocation.description)) && (
         <View style={styles.selectedLocationContainer}>
@@ -267,9 +241,6 @@ const styles = StyleSheet.create({
   },
   rightIconContainer: {
     marginLeft: 10,
-  },
-  manualInputContainer: {
-    flex: 1,
   },
 });
 
