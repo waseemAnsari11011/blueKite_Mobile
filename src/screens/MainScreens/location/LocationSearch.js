@@ -12,7 +12,6 @@ import { GOOGLE_API_KEY } from '@env';
 const GOOGLE_PLACES_API_KEY = GOOGLE_API_KEY;
 
 const LocationSearch = ({ navigation, route }) => {
-  console.log("route.params.isCheckout--->>>", route?.params?.isCheckOut)
   const dispatch = useDispatch()
   const { data } = useSelector(state => state?.local);
   const [selectedLocation, setSelectedLocation] = useState(null);
