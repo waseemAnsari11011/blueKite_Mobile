@@ -5,8 +5,6 @@ import Geolocation from 'react-native-geolocation-service';
 import { request, PERMISSIONS } from 'react-native-permissions';
 import { GOOGLE_API_KEY } from '@env';
 
-console.log("GOOGLE_API_KEY-->>", GOOGLE_API_KEY)
-
 // const GOOGLE_API_KEY = 'AIzaSyA7_-ti7wWjitTNFUVP2VGrrVkfffulY4A'
 
 const ManualLocationSearch = ({ manualLocation, handleManualLocationChange }) => {
@@ -53,10 +51,15 @@ const ManualLocationSearch = ({ manualLocation, handleManualLocationChange }) =>
     }, []);
 
     const getPhysicalAddress = async (latitude, longitude) => {
+        // console.log("latitude, longitude", latitude, longitude)
+        // const latitude = '28.634086496667226'
+        // const longitude = '77.39088378887918'
         try {
             const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_API_KEY}`);
             if (response.status === 200) {
                 const addressComponents = response.data.results[0].address_components;
+                // console.log("addressComponents--->>", response.data.results[1])
+
                 const location = {
                     description: response.data.results[0].formatted_address,
                     city: addressComponents.find((component) => component.types.includes('locality'))?.long_name,
