@@ -58,7 +58,7 @@ const ImagePickerComponent = ({ handleImage, url }) => {
           <View>
             <Image
               source={
-                image.includes('uploads/customers') 
+                image.includes('uploads/customer') 
                   ? { uri:  `${baseURL}${image}` }
                   : { uri:  image }
               }
