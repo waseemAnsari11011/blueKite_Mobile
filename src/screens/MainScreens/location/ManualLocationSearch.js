@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { View, TextInput, ScrollView, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import { request, PERMISSIONS } from 'react-native-permissions';
-import { GOOGLE_API_KEY } from '@env';
+// import { GOOGLE_API_KEY } from '@env';
 
-// const GOOGLE_API_KEY = 'AIzaSyA7_-ti7wWjitTNFUVP2VGrrVkfffulY4A'
+const GOOGLE_API_KEY = 'AIzaSyBtcD7utCMCNfVxGvn9CWoKSH-BJ068uw0'
 
 const ManualLocationSearch = ({ manualLocation, handleManualLocationChange }) => {
     const [loading, setLoading] = useState(false);

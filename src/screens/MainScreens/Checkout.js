@@ -21,7 +21,7 @@ const CheckoutScreen = ({ navigation }) => {
     const { cartItems } = useSelector(state => state.cart);
     const subtotalPrice = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0)
     const [loading, setloading] = useState(false)
-    const [paymentMethod, setPaymentMethod] = useState('online');
+    const [paymentMethod, setPaymentMethod] = useState('cod');
 
     const placeOrder = async (orderData) => {
         try {
@@ -311,10 +311,10 @@ const CheckoutScreen = ({ navigation }) => {
             <View style={{ padding: 16 }}>
                 <Text>Select Payment Method:</Text>
                 <RadioButton.Group onValueChange={value => setPaymentMethod(value)} value={paymentMethod}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <RadioButton value="online" />
                         <Text>Online Payment</Text>
-                    </View>
+                    </View> */}
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <RadioButton value="cod" />
                         <Text>Cash on Delivery (COD)</Text>

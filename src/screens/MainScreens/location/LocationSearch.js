@@ -9,7 +9,7 @@ import api from '../../../utils/api';
 import { loadData, saveData } from '../../../config/redux/actions/storageActions';
 import { GOOGLE_API_KEY } from '@env';
 
-const GOOGLE_PLACES_API_KEY = GOOGLE_API_KEY;
+const GOOGLE_PLACES_API_KEY = "AIzaSyBtcD7utCMCNfVxGvn9CWoKSH-BJ068uw0";
 
 const LocationSearch = ({ navigation, route }) => {
   const dispatch = useDispatch()
