@@ -269,7 +269,7 @@ const CheckoutScreen = ({ navigation }) => {
         const totalDiscount = cartItems.reduce((acc, item) => acc + (item.price * (item.discount / 100)) * item.quantity, 0);
 
         // Define the shipping fee (assuming a constant value)
-        const shippingFee = 0.00;
+        const shippingFee = 33.00;
 
         // Define the tax (assuming no tax for simplicity)
         const tax = 0.00;
