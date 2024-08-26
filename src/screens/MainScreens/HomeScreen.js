@@ -48,20 +48,6 @@ const HomeScreen = ({ navigation }) => {
   }, [dispatch]);
 
 
-  const data2 = [
-    {
-      image: require('../../assets/images/banner1.jpg'),
-    },
-    {
-      image: require('../../assets/images/banner2.jpg'),
-    },
-    {
-      image: require('../../assets/images/banner3.jpg'),
-    },
-    {
-      image: require('../../assets/images/banner4.jpg'),
-    },
-  ];
 
 
   useEffect(() => {
