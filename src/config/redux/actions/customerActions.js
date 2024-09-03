@@ -22,3 +22,17 @@ export const updateCustomer = (token, customerId, formData) => async dispatch =>
         dispatch({ type: UPDATE_CUSTOMER_FAILURE, payload: error.message });
     }
 };
+
+export const updateFcm = async (customerId, data) => {
+
+    // console.log(" updateFcm token-->>", data)
+    try {
+        const response = await api.put(`/update-fcm/${customerId}`, {fcmDeviceToken:data});
+        // console.log("response.data-->>", response.data);
+        return { success: true, user: response.data };
+    } catch (error) {
+        // Handle error here if needed
+        console.error('Error updating FCM token:', error);
+        return { success: false, error: error.message };
+    }r
+};
