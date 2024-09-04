@@ -2,8 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
 import Icon from './Icons/Icon';
 import { baseURL } from '../utils/api';
+import calculateDiscountedPrice from '../utils/calculateDiscountedPrice';
 
 const ProductCard = ({ item }) => {
+    console.log("item==>>", item)
     return (
         <View style={[styles.cardContainer]}>
             <View style={styles.discountTag}>
@@ -34,7 +36,7 @@ const ProductCard = ({ item }) => {
                 </Text>
                 <View style={styles.priceContainer}>
                     <Text style={styles.originalPrice}>₹{item.price}</Text>
-                    <Text style={styles.discountedPrice}>₹{item.discountPrice}</Text>
+                    <Text style={styles.discountedPrice}>₹{calculateDiscountedPrice(item.price, item.discount)}</Text>
                 </View>
             </View>
 

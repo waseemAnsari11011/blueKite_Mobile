@@ -39,9 +39,9 @@ const OrderItem = ({ order }) => {
                             <View key={productItem._id} style={styles.productContainer}>
                                 <Paragraph style={styles.productName}><Icon.FontAwesome name="cube" size={16} /> Product: {productItem.product.name}</Paragraph>
                                 <Paragraph style={styles.productDetails}><Icon.FontAwesome name="sort-numeric-asc" size={16} /> Quantity: {productItem.quantity}</Paragraph>
-                                <Paragraph style={styles.productDetails}><Icon.FontAwesome name="dollar" size={16} /> Price: ${productItem.price}</Paragraph>
+                                <Paragraph style={styles.productDetails}><Icon.FontAwesome name="dollar" size={16} /> Price: ₹{productItem.price}</Paragraph>
                                 <Paragraph style={styles.productDetails}><Icon.FontAwesome name="percent" size={16} /> Discount: {productItem.discount}%</Paragraph>
-                                <Paragraph style={styles.productDetails}><Icon.FontAwesome name="calculator" size={16} /> Total Amount: ${productItem.totalAmount.toFixed(2)}</Paragraph>
+                                <Paragraph style={styles.productDetails}><Icon.FontAwesome name="calculator" size={16} /> Total Amount: ₹{productItem.totalAmount.toFixed(2)}</Paragraph>
                             </View>
                         ))}
                     </View>

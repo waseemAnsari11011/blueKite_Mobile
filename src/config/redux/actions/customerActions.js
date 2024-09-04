@@ -28,7 +28,7 @@ export const updateFcm = async (customerId, data) => {
     // console.log(" updateFcm token-->>", data)
     try {
         const response = await api.put(`/update-fcm/${customerId}`, {fcmDeviceToken:data});
-        // console.log("response.data-->>", response.data);
+        console.log("response.data fcm-->>", response.data, data);
         return { success: true, user: response.data };
     } catch (error) {
         // Handle error here if needed

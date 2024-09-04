@@ -25,6 +25,8 @@ import { fetchRecentlyAddedProducts, updateRecentlyAddedProductsPage, resetRecen
 import { fetchCategories } from '../../config/redux/actions/categoryAction';
 import { fetchDiscountedProducts, updateDiscountedProductsPage, resetDiscountedProducts } from '../../config/redux/actions/discountedProductsActions';
 import { getBanners } from '../../config/redux/actions/bannerActions';
+import { updateFcm } from '../../config/redux/actions/customerActions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const { width } = Dimensions.get('window');
@@ -44,11 +46,19 @@ const HomeScreen = ({ navigation }) => {
   console.log("banners-->>", banners)
 
   useEffect(() => {
+    const fetchAndUpdateFcm = async () => {
+      const deviceToken = await AsyncStorage.getItem('deviceToken');
+      console.log("home deviceToken-->>", deviceToken)
+      const deviceTokenData = JSON.parse(deviceToken);
+      await updateFcm(data?.user?._id, deviceTokenData);
+    };
+
+    fetchAndUpdateFcm();
+  }, [data?.user?._id]);
+
+  useEffect(() => {
     dispatch(getBanners());
   }, [dispatch]);
-
-
-
 
   useEffect(() => {
     if (!categoryLoading) {
