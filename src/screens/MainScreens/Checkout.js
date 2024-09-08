@@ -90,6 +90,7 @@ const CheckoutScreen = ({ navigation }) => {
             .then(savedOrder => {
                 setloading(false)
                 dispatch(clearCart())
+                Alert.alert('Order placed Successfully!');
                 navigation.navigate('Home')
 
             })
