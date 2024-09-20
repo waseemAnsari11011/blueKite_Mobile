@@ -183,7 +183,7 @@ const ProfileScreen = ({ navigation }) => {
       </View>
       <View style={styles.footer}>
         <Text style={styles.footerText}>BlueKite</Text>
-        <Text style={styles.footerSubText}>© 2012 BlueKite.</Text>
+        <Text style={styles.footerSubText}>© 2024 BlueKite.</Text>
         <TouchableOpacity onPress={openLink}>
           <Text style={[styles.footerSubText, { color: 'blue', textDecorationLine: 'underline' }]}>
             Developed by Waizcom.com
