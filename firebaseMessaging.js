@@ -1,8 +1,6 @@
 // firebaseMessaging.js
 
 import messaging from '@react-native-firebase/messaging';
-import { updateFcm } from './src/config/redux/actions/customerActions';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 // Background message handler
