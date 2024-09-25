@@ -27,10 +27,9 @@ const ProductCard = ({ item }) => {
                 style={styles.productImage}
             />}
             <View style={{ padding: 10 }}>
-                {/* <View style={styles.ratingContainer}>
-                    <Icon.FontAwesome name="star" size={13} color="#FDCC0D" />
-                    <Text style={styles.ratingText}>{item.rating} ({item.count})</Text>
-                </View> */}
+                {item?.quantity === 0 &&<View style={styles.unavailableContainer}>
+                    <Text style={styles.unavailableText}>Currently unavailable</Text>
+                </View>}
                 <Text numberOfLines={2} ellipsizeMode="tail" style={styles.productName}>
                     {item?.name}
                 </Text>
@@ -95,6 +94,16 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: '#777',
         marginLeft: 5
+    },
+    unavailableContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 5,
+    },
+    unavailableText: {
+        fontSize: 13,
+        color: 'red',
+        fontWeight: '700'
     },
     productName: {
         fontSize: 13,

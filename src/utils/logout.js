@@ -6,14 +6,12 @@ import { clearAllData } from '../config/redux/actions/storageActions';
 import { Alert } from 'react-native';
 import { logout } from '../config/redux/actions/authActions';
 import Icon from '../components/Icons/Icon';
-import auth from '@react-native-firebase/auth';
 const LogoutButton = ({ isVisible }) => {
   const dispatch = useDispatch();
 
   const handleLogout = async () => {
     dispatch(clearCart());
     dispatch(clearAllData());
-    await auth().signOut();
   };
 
   const showAlert = () => {

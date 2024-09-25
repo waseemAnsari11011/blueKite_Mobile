@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, TextInput, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { Button, TextInput, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert , KeyboardAvoidingView, ScrollView} from 'react-native';
 import { useDispatch } from 'react-redux';
 import OtpInputScreen from '../components/OtpInputScreen';
 import { saveData } from '../config/redux/actions/storageActions';
@@ -26,7 +26,7 @@ function PhoneSignIn({ navigation }) {
 
   const generateOtp = () => {
     return Math.floor(1000 + Math.random() * 9000).toString(); // Generate a 4-digit OTP
-};
+  };
 
 
   const checkUserRestriction = async () => {
@@ -87,7 +87,7 @@ function PhoneSignIn({ navigation }) {
   };
 
   const confirmCode = async (code) => {
-    console.log("code === generatedOtp-->>>", code ,generatedOtp)
+    console.log("code === generatedOtp-->>>", code, generatedOtp)
     setLoading(true);
     try {
       if (code.toString() === generatedOtp.toString()) {
@@ -100,11 +100,11 @@ function PhoneSignIn({ navigation }) {
         };
         const result = await dispatch(PhoneLogin(body));
         if (result.success && result.user && !result.user.isRestricted) {
-          
+
           dispatch(saveData('token', result.token));
           dispatch(saveData('user', result.user));
-         
-  
+
+
         }
       } else {
         throw new Error('Invalid OTP');
@@ -121,40 +121,47 @@ function PhoneSignIn({ navigation }) {
   return (
     <>
       {loading && <Loading />}
-      <View style={{ flex: 1, backgroundColor: '#fff' }}>
-        <View style={styles.Uppercontainer}>
-          <Text style={styles.headerText}>Let's start with your mobile number</Text>
-          <Text style={styles.subText}>We will send a text with a verification code.</Text>
-          <View style={styles.inputContainer}>
-            <Text style={styles.countryCode}>+91</Text>
-            <TextInput
-              style={styles.phoneNumberInput}
-              value={phoneNumber}
-              onChangeText={handlePhoneNumberChange}
-              placeholder="Mobile Number"
-              keyboardType="phone-pad"
-              maxLength={10}
-            />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <View style={{ flex: 1, backgroundColor: '#fff' }}>
+            <View style={styles.Uppercontainer}>
+              <Text style={styles.headerText}>Let's start with your mobile number</Text>
+              <Text style={styles.subText}>We will send a text with a verification code.</Text>
+              <View style={styles.inputContainer}>
+                <Text style={styles.countryCode}>+91</Text>
+                <TextInput
+                  style={styles.phoneNumberInput}
+                  value={phoneNumber}
+                  onChangeText={handlePhoneNumberChange}
+                  placeholder="Mobile Number"
+                  keyboardType="phone-pad"
+                  maxLength={10}
+                />
+              </View>
+              <TouchableOpacity
+                style={[styles.nextButton, { backgroundColor: isNextButtonEnabled ? "green" : '#ccc' }]}
+                onPress={checkUserRestriction}
+                disabled={!isNextButtonEnabled || loading}
+              >
+                <Text style={[styles.nextButtonText, { color: isNextButtonEnabled ? 'white' : 'black' }]}>Next</Text>
+              </TouchableOpacity>
+            </View>
+            {confirm && (
+              <OtpInputScreen
+                onConfirm={confirmCode}
+                resendOtp={sendOtp}
+                countdown={countdown}
+                setCountdown={setCountdown}
+                isResendButtonDisabled={isResendButtonDisabled}
+                setIsResendButtonDisabled={setIsResendButtonDisabled}
+              />
+            )}
           </View>
-          <TouchableOpacity
-            style={[styles.nextButton, { backgroundColor: isNextButtonEnabled ? "green" : '#ccc' }]}
-            onPress={checkUserRestriction}
-            disabled={!isNextButtonEnabled || loading}
-          >
-            <Text style={[styles.nextButtonText, { color: isNextButtonEnabled ? 'white' : 'black' }]}>Next</Text>
-          </TouchableOpacity>
-        </View>
-        {confirm && (
-          <OtpInputScreen
-            onConfirm={confirmCode}
-            resendOtp={sendOtp}
-            countdown={countdown}
-            setCountdown={setCountdown}
-            isResendButtonDisabled={isResendButtonDisabled}
-            setIsResendButtonDisabled={setIsResendButtonDisabled}
-          />
-        )}
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </>
   );
 }

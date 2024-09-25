@@ -13,16 +13,16 @@ import { fetchSimilarProducts, updateSimilarProductsPage, resetSimilarProducts }
 
 const Details = ({ route, navigation }) => {
   const dispatch = useDispatch();
-  const {data} = useSelector(state => state?.local);
+  const { data } = useSelector(state => state?.local);
   const { loading, products, error, page, limit, reachedEnd } = useSelector(state => state.similarProducts);
-  const { name, images, description, price, _id, rating, discount } = route.params.product;
+  const { name, images, description, price, _id, rating, discount, quantity } = route.params.product;
   const cartItems = useSelector(state => state.cart.cartItems);
   const existingItemIndex = cartItems.findIndex(i => i._id === _id);
-  const quantity = existingItemIndex !== -1 ? cartItems[existingItemIndex].quantity : 0;
+  const cartquantity = existingItemIndex !== -1 ? cartItems[existingItemIndex].quantity : 0;
   const flatListRef = useRef(null); // Ref for FlatList
 
   const productId = _id
-  const product =route.params.product
+  const product = route.params.product
 
 
   useEffect(() => {
@@ -54,10 +54,10 @@ const Details = ({ route, navigation }) => {
 
   const renderItems = ({ item }) => (
     <TouchableOpacity
-    onPress={() => {
-      navigation.navigate('Details', { product: item });
-      flatListRef.current.scrollToOffset({ offset: 0, animated: true }); // Scroll to top
-    }}
+      onPress={() => {
+        navigation.navigate('Details', { product: item });
+        flatListRef.current.scrollToOffset({ offset: 0, animated: true }); // Scroll to top
+      }}
 
     >
       <ProductCard item={item} />
@@ -76,10 +76,15 @@ const Details = ({ route, navigation }) => {
             <Text style={styles.discountedPrice}>₹{calculateDiscountedPrice(price, discount)}</Text>
             <Text style={styles.originalPrice}>₹{price}</Text>
           </View>
-          {existingItemIndex === -1 ?
-            <AddToCartBtn product={product} /> :
-            <QuantityUpdater quantity={quantity} item={product} />
+          {
+            quantity === 0 ?
+              <Text style={{ fontWeight: 'bold', color: 'red' }}>Currently unavailable</Text> :
+              (existingItemIndex === -1 ?
+                <AddToCartBtn product={product} /> :
+                <QuantityUpdater quantity={cartquantity} item={product} />
+              )
           }
+
         </View>
         <Text style={styles.details}>{description}</Text>
       </View>
