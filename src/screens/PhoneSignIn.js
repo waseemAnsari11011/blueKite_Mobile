@@ -1,14 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { Button, TextInput, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert , KeyboardAvoidingView, ScrollView} from 'react-native';
-import { useDispatch } from 'react-redux';
+import React, {useState, useEffect} from 'react';
+import {
+  Button,
+  TextInput,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  ScrollView,
+} from 'react-native';
+import {useDispatch} from 'react-redux';
 import OtpInputScreen from '../components/OtpInputScreen';
-import { saveData } from '../config/redux/actions/storageActions';
-import { PhoneLogin } from '../config/redux/actions/authActions';
+import {saveData} from '../config/redux/actions/storageActions';
+import {PhoneLogin} from '../config/redux/actions/authActions';
 import Loading from '../components/Loading';
 import api from '../utils/api';
 import axios from 'axios';
 
-function PhoneSignIn({ navigation }) {
+function PhoneSignIn({navigation}) {
   const dispatch = useDispatch();
   const [confirm, setConfirm] = useState(null);
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -19,7 +30,7 @@ function PhoneSignIn({ navigation }) {
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [generatedOtp, setGeneratedOtp] = useState(null); // Store the generated OTP
 
-  const handlePhoneNumberChange = (text) => {
+  const handlePhoneNumberChange = text => {
     setPhoneNumber(text);
     setIsNextButtonEnabled(text.length === 10);
   };
@@ -28,16 +39,15 @@ function PhoneSignIn({ navigation }) {
     return Math.floor(1000 + Math.random() * 9000).toString(); // Generate a 4-digit OTP
   };
 
-
   const checkUserRestriction = async () => {
-    console.log("checkUserRestriction")
+    console.log('checkUserRestriction');
     try {
       const response = await api.post('/check-restricted', {
-        contactNumber: `+91${phoneNumber}` || undefined // Send contactNumber only if it's provided
+        contactNumber: `+91${phoneNumber}` || undefined, // Send contactNumber only if it's provided
       });
 
       if (response.status === 200) {
-        console.log("sendOtp")
+        console.log('sendOtp');
         // User is not restricted, proceed further
         sendOtp(); // Replace 'NextScreen' with your next screen
       }
@@ -51,7 +61,10 @@ function PhoneSignIn({ navigation }) {
         }
       } else {
         // Other errors
-        Alert.alert('Error', 'Network error. Please check your internet connection.');
+        Alert.alert(
+          'Error',
+          'Network error. Please check your internet connection.',
+        );
       }
     }
   };
@@ -66,7 +79,7 @@ function PhoneSignIn({ navigation }) {
       const url = `https://sms.renflair.in/V1.php?API=${API}&PHONE=${phoneNumber}&OTP=${otp}`;
       const response = await axios.get(url);
 
-      console.log("response.data-->>", response.data)
+      console.log('response.data-->>', response.data);
 
       if (response.data.status === 'SUCCESS') {
         setConfirm(true);
@@ -86,8 +99,8 @@ function PhoneSignIn({ navigation }) {
     }
   };
 
-  const confirmCode = async (code) => {
-    console.log("code === generatedOtp-->>>", code, generatedOtp)
+  const confirmCode = async code => {
+    console.log('code === generatedOtp-->>>', code, generatedOtp);
     setLoading(true);
     try {
       if (code.toString() === generatedOtp.toString()) {
@@ -100,11 +113,8 @@ function PhoneSignIn({ navigation }) {
         };
         const result = await dispatch(PhoneLogin(body));
         if (result.success && result.user && !result.user.isRestricted) {
-
           dispatch(saveData('token', result.token));
           dispatch(saveData('user', result.user));
-
-
         }
       } else {
         throw new Error('Invalid OTP');
@@ -122,14 +132,17 @@ function PhoneSignIn({ navigation }) {
     <>
       {loading && <Loading />}
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <View style={{ flex: 1, backgroundColor: '#fff' }}>
+        style={{flex: 1}}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+          <View style={{flex: 1, backgroundColor: '#fff'}}>
             <View style={styles.Uppercontainer}>
-              <Text style={styles.headerText}>Let's start with your mobile number</Text>
-              <Text style={styles.subText}>We will send a text with a verification code.</Text>
+              <Text style={styles.headerText}>
+                Let's start with your mobile number
+              </Text>
+              <Text style={styles.subText}>
+                We will send a text with a verification code.
+              </Text>
               <View style={styles.inputContainer}>
                 <Text style={styles.countryCode}>+91</Text>
                 <TextInput
@@ -142,11 +155,19 @@ function PhoneSignIn({ navigation }) {
                 />
               </View>
               <TouchableOpacity
-                style={[styles.nextButton, { backgroundColor: isNextButtonEnabled ? "green" : '#ccc' }]}
+                style={[
+                  styles.nextButton,
+                  {backgroundColor: isNextButtonEnabled ? 'green' : '#ccc'},
+                ]}
                 onPress={checkUserRestriction}
-                disabled={!isNextButtonEnabled || loading}
-              >
-                <Text style={[styles.nextButtonText, { color: isNextButtonEnabled ? 'white' : 'black' }]}>Next</Text>
+                disabled={!isNextButtonEnabled || loading}>
+                <Text
+                  style={[
+                    styles.nextButtonText,
+                    {color: isNextButtonEnabled ? 'white' : 'black'},
+                  ]}>
+                  Next
+                </Text>
               </TouchableOpacity>
             </View>
             {confirm && (
@@ -176,7 +197,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
-    color: "green",
+    color: 'green',
   },
   subText: {
     fontSize: 16,
