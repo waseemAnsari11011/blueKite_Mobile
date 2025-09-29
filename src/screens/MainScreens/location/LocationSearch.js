@@ -16,8 +16,6 @@ import api from '../../../utils/api';
 import {loadData, saveData} from '../../../config/redux/actions/storageActions';
 import {GOOGLE_API_KEY} from '@env';
 
-const GOOGLE_PLACES_API_KEY = '';
-
 const LocationSearch = ({navigation, route}) => {
   const dispatch = useDispatch();
   const {data} = useSelector(state => state?.local);
@@ -152,7 +150,7 @@ const LocationSearch = ({navigation, route}) => {
           fetchDetails={true}
           onPress={handleLocationSelect}
           query={{
-            key: GOOGLE_PLACES_API_KEY,
+            key: GOOGLE_API_KEY,
             language: 'en',
           }}
           styles={{

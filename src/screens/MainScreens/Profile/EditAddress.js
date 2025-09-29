@@ -16,6 +16,7 @@ import {
 import {useDispatch, useSelector} from 'react-redux';
 import Loading from '../../../components/Loading';
 import {saveData} from '../../../config/redux/actions/storageActions';
+import {GOOGLE_API_KEY} from '@env';
 
 const EditAddress = ({navigation}) => {
   const dispatch = useDispatch();

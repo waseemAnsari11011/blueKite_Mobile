@@ -53,6 +53,7 @@ function PhoneSignIn({navigation}) {
         sendOtp(); // Replace 'NextScreen' with your next screen
       }
     } catch (error) {
+      console.log(error);
       if (error.response) {
         // Server responded with a status other than 200 range
         if (error.response.status === 403) {
