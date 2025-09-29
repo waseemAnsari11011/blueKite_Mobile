@@ -6,6 +6,7 @@ import {
 } from './types';
 
 export const fetchCategories = userAddress => {
+  console.log('userAddress==>>', userAddress);
   return async dispatch => {
     dispatch({type: FETCH_CATEGORY_REQUEST});
     try {

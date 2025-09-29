@@ -10,9 +10,7 @@ import {
 } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import {request, PERMISSIONS} from 'react-native-permissions';
-// import { GOOGLE_API_KEY } from '@env';
-
-const GOOGLE_API_KEY = '';
+import {GOOGLE_API_KEY} from '@env';
 
 const ManualLocationSearch = ({manualLocation, handleManualLocationChange}) => {
   const [loading, setLoading] = useState(false);

@@ -64,14 +64,13 @@ const HomeScreen = ({navigation}) => {
     error: onDiscountError,
   } = useSelector(state => state.discountedProducts);
 
-  console.log('banners-->>', banners);
-
   useEffect(() => {
     const fetchAndUpdateFcm = async () => {
       const deviceToken = await AsyncStorage.getItem('deviceToken');
-      console.log('home deviceToken-->>', deviceToken);
-      const deviceTokenData = JSON.parse(deviceToken);
-      await updateFcm(data?.user?._id, deviceTokenData);
+      if (deviceToken && data?.user?._id) {
+        const deviceTokenData = JSON.parse(deviceToken);
+        await updateFcm(data.user._id, deviceTokenData);
+      }
     };
 
     fetchAndUpdateFcm();
@@ -82,24 +81,33 @@ const HomeScreen = ({navigation}) => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (!categoryLoading) {
-      const shippingAddresses =
-        data?.user?.shippingAddresses?.map(addr => addr.address) || [];
-      dispatch(fetchCategories(shippingAddresses));
-    }
-    if (!categoryLoading) {
-      dispatch(
-        fetchRecentlyAddedProducts(1, 4, data?.user.availableLocalities),
-      );
-    }
-    if (!onDiscountLoading) {
-      dispatch(fetchDiscountedProducts(1, 4, data?.user.availableLocalities));
-    }
-  }, [dispatch, data?.user?.shippingAddresses, data?.user.availableLocalities]);
+    // This effect runs only when the user data becomes available.
+    const initializeAppData = async () => {
+      if (data && data.user) {
+        // 1. Update FCM token
+        const deviceToken = await AsyncStorage.getItem('deviceToken');
+        if (deviceToken) {
+          const deviceTokenData = JSON.parse(deviceToken);
+          updateFcm(data.user._id, deviceTokenData);
+        }
 
-  // Assuming user address is stored in redux state like this.
-  // You might need to adjust this based on your actual state structure.
-  const userAddress = useSelector(state => state.local?.data?.user?.address);
+        // 2. Fetch banners
+        dispatch(getBanners());
+
+        // 3. Get user's primary shipping address
+        const userAddress = data.user.shippingAddresses?.address;
+
+        // 4. Fetch all data that depends on user's location
+        dispatch(fetchCategories(userAddress));
+        dispatch(
+          fetchRecentlyAddedProducts(1, 4, data.user.availableLocalities),
+        );
+        dispatch(fetchDiscountedProducts(1, 4, data.user.availableLocalities));
+      }
+    };
+
+    initializeAppData();
+  }, [dispatch, data.user]); // Dependency on `data.user` ensures this runs only when user data is loaded.
 
   if (categoryError) {
     return (
@@ -190,14 +198,6 @@ const HomeScreen = ({navigation}) => {
             renderItem={renderCategory}
           />
         </ScrollView>
-        {/* <View style={{ marginHorizontal: -20 }}>
-          <FlatList
-            horizontal
-            data={category}
-            renderItem={renderCategory}
-            keyExtractor={(item) => item._id.toString()}
-          />
-        </View> */}
       </View>
 
       <View
@@ -223,7 +223,7 @@ const HomeScreen = ({navigation}) => {
               color: 'green',
               marginRight: 5,
               fontSize: 15,
-              fontWeight: 600,
+              fontWeight: '600',
             }}>
             View all
           </Text>
@@ -237,8 +237,8 @@ const HomeScreen = ({navigation}) => {
         renderItem={renderItems}
         numColumns={2}
         columnWrapperStyle={{
-          justifyContent: 'space-between', // Adjusts spacing between items horizontally
-          marginBottom: 5, // Adjusts spacing between rows
+          justifyContent: 'space-between',
+          marginBottom: 5,
         }}
         contentContainerStyle={{padding: 15}}
       />
@@ -266,7 +266,7 @@ const HomeScreen = ({navigation}) => {
               color: 'green',
               marginRight: 5,
               fontSize: 15,
-              fontWeight: 600,
+              fontWeight: '600',
             }}>
             View all
           </Text>
@@ -286,8 +286,8 @@ const HomeScreen = ({navigation}) => {
         ListHeaderComponent={ListHeaderComponent}
         numColumns={2}
         columnWrapperStyle={{
-          justifyContent: 'space-between', // Adjusts spacing between items horizontally
-          marginBottom: 5, // Adjusts spacing between rows
+          justifyContent: 'space-between',
+          marginBottom: 5,
         }}
         contentContainerStyle={{padding: 15}}
       />
