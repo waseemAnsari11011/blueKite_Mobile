@@ -1,19 +1,26 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Switch, TouchableOpacity, Alert } from 'react-native';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import React, {useEffect, useRef, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Switch,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import Icon from 'react-native-vector-icons/Ionicons'; // Assume using Ionicons from react-native-vector-icons
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import ManualLocationSearch from './ManualLocationSearch'; // Import the new component
 import ButtonComponent from '../../../components/Button';
 import api from '../../../utils/api';
-import { loadData, saveData } from '../../../config/redux/actions/storageActions';
-import { GOOGLE_API_KEY } from '@env';
+import {loadData, saveData} from '../../../config/redux/actions/storageActions';
+import {GOOGLE_API_KEY} from '@env';
 
-const GOOGLE_PLACES_API_KEY = "AIzaSyBtcD7utCMCNfVxGvn9CWoKSH-BJ068uw0";
+const GOOGLE_PLACES_API_KEY = '';
 
-const LocationSearch = ({ navigation, route }) => {
-  const dispatch = useDispatch()
-  const { data } = useSelector(state => state?.local);
+const LocationSearch = ({navigation, route}) => {
+  const dispatch = useDispatch();
+  const {data} = useSelector(state => state?.local);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [searchLocation, setSearchLocation] = useState(false);
   const [manualLocation, setManualLocation] = useState({
@@ -39,7 +46,7 @@ const LocationSearch = ({ navigation, route }) => {
         return; // If no location is selected, exit the function
       }
 
-      const { description, city, state, country, pincode } = location;
+      const {description, city, state, country, pincode} = location;
 
       // Check for missing fields
       if (!description || !city || !state || !country || !pincode) {
@@ -50,13 +57,16 @@ const LocationSearch = ({ navigation, route }) => {
         if (!country) missingFields.push('country');
         if (!pincode) missingFields.push('pincode');
 
-        Alert.alert('Missing Information', `Please enter the following: ${missingFields.join(', ')}`);
+        Alert.alert(
+          'Missing Information',
+          `Please enter the following: ${missingFields.join(', ')}`,
+        );
         return; // Exit the function if any field is missing
       }
 
       const availableLocalities = pincode;
 
-      console.log("pincode-->>", pincode);
+      console.log('pincode-->>', pincode);
 
       // Get the userId from your application's state or context
       const userId = data?.user?._id; // Replace 'user_id_here' with the actual userId
@@ -68,13 +78,13 @@ const LocationSearch = ({ navigation, route }) => {
         state,
         country,
         postalCode: pincode,
-        availableLocalities
+        availableLocalities,
       });
 
       if (response.status === 200) {
         dispatch(saveData('user', response.data.user));
         if (route?.params?.isCheckOut || route?.params?.goBack) {
-          console.log("Checkout location ran");
+          console.log('Checkout location ran');
           dispatch(loadData('user'));
           navigation.goBack();
         } else {
@@ -88,22 +98,24 @@ const LocationSearch = ({ navigation, route }) => {
     }
   };
   const handleLocationSelect = (data, details) => {
-    const pincode = details.address_components.find(
-      (component) => component.types.includes('postal_code')
+    const pincode = details.address_components.find(component =>
+      component.types.includes('postal_code'),
     )?.long_name;
-    const state = details.address_components.find(
-      (component) => component.types.includes('administrative_area_level_1')
+    const state = details.address_components.find(component =>
+      component.types.includes('administrative_area_level_1'),
     )?.long_name;
-    const country = details.address_components.find(
-      (component) => component.types.includes('country')
+    const country = details.address_components.find(component =>
+      component.types.includes('country'),
     )?.long_name;
-    const city = details.address_components.find(
-      (component) => component.types.includes('locality')
+    const city = details.address_components.find(component =>
+      component.types.includes('locality'),
     )?.long_name;
 
     if (!pincode) {
       // Alert the user and clear the search input and selected location
-      alert('The selected location does not have a valid pincode. Please select another address.');
+      alert(
+        'The selected location does not have a valid pincode. Please select another address.',
+      );
       googlePlacesRef.current?.clear();
       setSelectedLocation(null);
       return;
@@ -114,12 +126,12 @@ const LocationSearch = ({ navigation, route }) => {
       pincode: pincode,
       state: state,
       country,
-      city
+      city,
     });
   };
 
   const handleManualLocationChange = (field, value) => {
-    setManualLocation((prevLocation) => ({
+    setManualLocation(prevLocation => ({
       ...prevLocation,
       [field]: value,
     }));
@@ -130,10 +142,7 @@ const LocationSearch = ({ navigation, route }) => {
       <Text style={styles.headerText}>Select location</Text>
       <View style={styles.switchContainer}>
         <Text>Search Location</Text>
-        <Switch
-          value={searchLocation}
-          onValueChange={setSearchLocation}
-        />
+        <Switch value={searchLocation} onValueChange={setSearchLocation} />
       </View>
       {searchLocation ? (
         <GooglePlacesAutocomplete
@@ -160,7 +169,9 @@ const LocationSearch = ({ navigation, route }) => {
             </View>
           )}
           renderRightButton={() => (
-            <TouchableOpacity onPress={() => googlePlacesRef.current?.clear()} style={styles.rightIconContainer}>
+            <TouchableOpacity
+              onPress={() => googlePlacesRef.current?.clear()}
+              style={styles.rightIconContainer}>
               <Icon name="close" size={20} color="#555" />
             </TouchableOpacity>
           )}
@@ -171,12 +182,27 @@ const LocationSearch = ({ navigation, route }) => {
           handleManualLocationChange={handleManualLocationChange}
         />
       )}
-      {(selectedLocation || (!searchLocation && manualLocation.description)) && (
+      {(selectedLocation ||
+        (!searchLocation && manualLocation.description)) && (
         <View style={styles.selectedLocationContainer}>
-          <Text style={styles.locationText}>Location: {!searchLocation ? manualLocation.description : selectedLocation.description}</Text>
-          <Text style={styles.pincodeText}>Pincode: {!searchLocation ? manualLocation.pincode : selectedLocation.pincode}</Text>
-          <View style={{ marginTop: 30 }}>
-            <ButtonComponent title={'Confirm Location'} color={'green'} onPress={handleLocation} />
+          <Text style={styles.locationText}>
+            Location:{' '}
+            {!searchLocation
+              ? manualLocation.description
+              : selectedLocation.description}
+          </Text>
+          <Text style={styles.pincodeText}>
+            Pincode:{' '}
+            {!searchLocation
+              ? manualLocation.pincode
+              : selectedLocation.pincode}
+          </Text>
+          <View style={{marginTop: 30}}>
+            <ButtonComponent
+              title={'Confirm Location'}
+              color={'green'}
+              onPress={handleLocation}
+            />
           </View>
         </View>
       )}

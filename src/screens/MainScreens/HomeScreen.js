@@ -7,12 +7,12 @@ import {
   ActivityIndicator,
   Image,
   Dimensions,
-  FlatList
+  FlatList,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Card from '../../components/Card';
-import { useDispatch, useSelector } from 'react-redux';
-import { addToCart } from '../../config/redux/actions/cartActions';
+import {useDispatch, useSelector} from 'react-redux';
+import {addToCart} from '../../config/redux/actions/cartActions';
 
 import Loading from '../../components/Loading';
 import Icon from '../../components/Icons/Icon';
@@ -20,35 +20,56 @@ import CardProducts from '../../components/CardProducts';
 import SearchBar from '../../components/SearchBar';
 import CustomImageCarousal from '../../components/CustomImageCarousalLandscape';
 import ProductCard from '../../components/ProductCard';
-import { baseURL } from '../../utils/api';
-import { fetchRecentlyAddedProducts, updateRecentlyAddedProductsPage, resetRecentlyAddedProducts } from '../../config/redux/actions/recentlyAddedActions';
-import { fetchCategories } from '../../config/redux/actions/categoryAction';
-import { fetchDiscountedProducts, updateDiscountedProductsPage, resetDiscountedProducts } from '../../config/redux/actions/discountedProductsActions';
-import { getBanners } from '../../config/redux/actions/bannerActions';
-import { updateFcm } from '../../config/redux/actions/customerActions';
+import {baseURL} from '../../utils/api';
+import {
+  fetchRecentlyAddedProducts,
+  updateRecentlyAddedProductsPage,
+  resetRecentlyAddedProducts,
+} from '../../config/redux/actions/recentlyAddedActions';
+import {fetchCategories} from '../../config/redux/actions/categoryAction';
+import {
+  fetchDiscountedProducts,
+  updateDiscountedProductsPage,
+  resetDiscountedProducts,
+} from '../../config/redux/actions/discountedProductsActions';
+import {getBanners} from '../../config/redux/actions/bannerActions';
+import {updateFcm} from '../../config/redux/actions/customerActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const {width} = Dimensions.get('window');
 
-const { width } = Dimensions.get('window');
-
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({navigation}) => {
   const dispatch = useDispatch();
-  const { loading: categoryLoading, category, error: categoryError } = useSelector(
-    state => state.categories,
-  );
-  const { loading: bannerLoading, banners, error: bannerError } = useSelector(state => state.banners);
+  const {
+    loading: categoryLoading,
+    category,
+    error: categoryError,
+  } = useSelector(state => state.categories);
+  const {
+    loading: bannerLoading,
+    banners,
+    error: bannerError,
+  } = useSelector(state => state.banners);
 
-  const { data } = useSelector(state => state?.local);
+  const {data} = useSelector(state => state?.local);
 
-  const { loading: recentlyAddedLoading, products: recentlyAddedProducts, error: recentlyAddedError, } = useSelector(state => state.recentlyAddedProducts);
-  const { loading: onDiscountLoading, products: onDiscountProducts, error: onDiscountError, } = useSelector(state => state.discountedProducts);
+  const {
+    loading: recentlyAddedLoading,
+    products: recentlyAddedProducts,
+    error: recentlyAddedError,
+  } = useSelector(state => state.recentlyAddedProducts);
+  const {
+    loading: onDiscountLoading,
+    products: onDiscountProducts,
+    error: onDiscountError,
+  } = useSelector(state => state.discountedProducts);
 
-  console.log("banners-->>", banners)
+  console.log('banners-->>', banners);
 
   useEffect(() => {
     const fetchAndUpdateFcm = async () => {
       const deviceToken = await AsyncStorage.getItem('deviceToken');
-      console.log("home deviceToken-->>", deviceToken)
+      console.log('home deviceToken-->>', deviceToken);
       const deviceTokenData = JSON.parse(deviceToken);
       await updateFcm(data?.user?._id, deviceTokenData);
     };
@@ -62,33 +83,33 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     if (!categoryLoading) {
-      dispatch(fetchCategories());
+      const shippingAddresses =
+        data?.user?.shippingAddresses?.map(addr => addr.address) || [];
+      dispatch(fetchCategories(shippingAddresses));
     }
     if (!categoryLoading) {
-      dispatch(fetchRecentlyAddedProducts(1, 4, data?.user.availableLocalities))
+      dispatch(
+        fetchRecentlyAddedProducts(1, 4, data?.user.availableLocalities),
+      );
     }
     if (!onDiscountLoading) {
-      dispatch(fetchDiscountedProducts(1, 4, data?.user.availableLocalities))
+      dispatch(fetchDiscountedProducts(1, 4, data?.user.availableLocalities));
     }
+  }, [dispatch, data?.user?.shippingAddresses, data?.user.availableLocalities]);
 
-  }, [dispatch]);
-
-  // useEffect(() => {
-  //   return () => {
-  //     dispatch(resetRecentlyAddedProducts());
-  //   };
-  // }, [dispatch]);
+  // Assuming user address is stored in redux state like this.
+  // You might need to adjust this based on your actual state structure.
+  const userAddress = useSelector(state => state.local?.data?.user?.address);
 
   if (categoryError) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <Text>{categoryError}</Text>
       </View>
     );
   }
 
-
-  const renderCategory = ({ item }) => (
+  const renderCategory = ({item}) => (
     <View>
       <TouchableOpacity
         onPress={() =>
@@ -102,47 +123,64 @@ const HomeScreen = ({ navigation }) => {
             alignSelf: 'baseline',
             alignItems: 'center',
             padding: 10,
-            elevation: 10
+            elevation: 10,
           }}>
           <Image
-            source={{ uri: `${baseURL}${item?.images[0]}` }}
-            style={{ width: 85, height: 85, borderRadius: 10 }}
+            source={{uri: `${baseURL}${item?.images[0]}`}}
+            style={{width: 85, height: 85, borderRadius: 10}}
           />
-          <Text style={{ marginTop: 10, fontSize: 13, fontWeight: '400', color: "#000000" }}>{item.name}</Text>
+          <Text
+            style={{
+              marginTop: 10,
+              fontSize: 13,
+              fontWeight: '400',
+              color: '#000000',
+            }}>
+            {item.name}
+          </Text>
         </View>
       </TouchableOpacity>
     </View>
   );
 
-  const renderItems = ({ item }) => (
-
-    <TouchableOpacity style={{}} onPress={() =>
-      navigation.navigate('Details', { product: item })
-    }>
+  const renderItems = ({item}) => (
+    <TouchableOpacity
+      style={{}}
+      onPress={() => navigation.navigate('Details', {product: item})}>
       <ProductCard item={item} />
     </TouchableOpacity>
-
   );
 
   const ListHeaderComponent = () => (
     <View style={{}}>
       <SearchBar />
-      <View style={{ marginTop: 15 }}>
-        <View style={{ marginHorizontal: -20 }}>
-          <CustomImageCarousal data={banners} autoPlay={true} pagination={true} />
+      <View style={{marginTop: 15}}>
+        <View style={{marginHorizontal: -20}}>
+          <CustomImageCarousal
+            data={banners}
+            autoPlay={true}
+            pagination={true}
+          />
         </View>
       </View>
-      <View style={{ marginBottom: 5, }}>
-        <Text style={{ fontSize: 18, fontWeight: '700', marginVertical: 5, color: "#000000" }}>Explore Categories</Text>
+      <View style={{marginBottom: 5}}>
+        <Text
+          style={{
+            fontSize: 18,
+            fontWeight: '700',
+            marginVertical: 5,
+            color: '#000000',
+          }}>
+          Explore Categories
+        </Text>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           directionalLockEnabled={true}
           alwaysBounceVertical={false}
-          style={{ marginHorizontal: -20 }}
-        >
+          style={{marginHorizontal: -20}}>
           <FlatList
-            contentContainerStyle={{ alignSelf: "flex-start" }}
+            contentContainerStyle={{alignSelf: 'flex-start'}}
             numColumns={Math.ceil(category.length / 2)}
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
@@ -162,15 +200,33 @@ const HomeScreen = ({ navigation }) => {
         </View> */}
       </View>
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text style={{ fontSize: 18, fontWeight: '700', marginVertical: 5, color: "#000000" }}>On Sale</Text>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+        <Text
+          style={{
+            fontSize: 18,
+            fontWeight: '700',
+            marginVertical: 5,
+            color: '#000000',
+          }}>
+          On Sale
+        </Text>
         <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('Discounted Products')
-          }
-          style={{ flexDirection: 'row', alignItems: 'center' }}
-        >
-          <Text style={{ color: 'green', marginRight: 5, fontSize: 15, fontWeight: 600 }}>View all</Text>
+          onPress={() => navigation.navigate('Discounted Products')}
+          style={{flexDirection: 'row', alignItems: 'center'}}>
+          <Text
+            style={{
+              color: 'green',
+              marginRight: 5,
+              fontSize: 15,
+              fontWeight: 600,
+            }}>
+            View all
+          </Text>
           <Icon.AntDesign name="right" color="#1e90ff" size={13} />
         </TouchableOpacity>
       </View>
@@ -184,28 +240,44 @@ const HomeScreen = ({ navigation }) => {
           justifyContent: 'space-between', // Adjusts spacing between items horizontally
           marginBottom: 5, // Adjusts spacing between rows
         }}
-        contentContainerStyle={{ padding: 15 }}
-
+        contentContainerStyle={{padding: 15}}
       />
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text style={{ fontSize: 18, fontWeight: '700', marginVertical: 5, color: "#000000" }}>New Arrivals</Text>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+        <Text
+          style={{
+            fontSize: 18,
+            fontWeight: '700',
+            marginVertical: 5,
+            color: '#000000',
+          }}>
+          New Arrivals
+        </Text>
         <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('New Arrivals')
-          }
-          style={{ flexDirection: 'row', alignItems: 'center' }}
-        >
-          <Text style={{ color: 'green', marginRight: 5, fontSize: 15, fontWeight: 600 }}>View all</Text>
+          onPress={() => navigation.navigate('New Arrivals')}
+          style={{flexDirection: 'row', alignItems: 'center'}}>
+          <Text
+            style={{
+              color: 'green',
+              marginRight: 5,
+              fontSize: 15,
+              fontWeight: 600,
+            }}>
+            View all
+          </Text>
           <Icon.AntDesign name="right" color="#1e90ff" size={13} />
         </TouchableOpacity>
       </View>
     </View>
   );
 
-
   return (
-    <View style={{ flex: 1, }}>
+    <View style={{flex: 1}}>
       {categoryLoading && <Loading />}
       <FlatList
         data={recentlyAddedProducts}
@@ -217,10 +289,8 @@ const HomeScreen = ({ navigation }) => {
           justifyContent: 'space-between', // Adjusts spacing between items horizontally
           marginBottom: 5, // Adjusts spacing between rows
         }}
-        contentContainerStyle={{ padding: 15 }}
-
+        contentContainerStyle={{padding: 15}}
       />
-
     </View>
   );
 };
@@ -230,7 +300,7 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     padding: 15,
-    backgroundColor: "#F0F8FF50",
+    backgroundColor: '#F0F8FF50',
   },
   wrapper: {
     height: 160,

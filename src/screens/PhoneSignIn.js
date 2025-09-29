@@ -40,6 +40,7 @@ function PhoneSignIn({navigation}) {
   };
 
   const checkUserRestriction = async () => {
+    setLoading(true);
     console.log('checkUserRestriction');
     try {
       const response = await api.post('/check-restricted', {
@@ -157,14 +158,20 @@ function PhoneSignIn({navigation}) {
               <TouchableOpacity
                 style={[
                   styles.nextButton,
-                  {backgroundColor: isNextButtonEnabled ? 'green' : '#ccc'},
+                  {
+                    backgroundColor:
+                      confirm || !isNextButtonEnabled ? '#ccc' : 'green',
+                  },
                 ]}
                 onPress={checkUserRestriction}
-                disabled={!isNextButtonEnabled || loading}>
+                disabled={confirm}>
                 <Text
                   style={[
                     styles.nextButtonText,
-                    {color: isNextButtonEnabled ? 'white' : 'black'},
+                    {
+                      color:
+                        confirm || !isNextButtonEnabled ? 'black' : 'white',
+                    },
                   ]}>
                   Next
                 </Text>
