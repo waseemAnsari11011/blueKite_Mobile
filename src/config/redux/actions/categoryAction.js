@@ -15,6 +15,8 @@ export const fetchCategories = userAddress => {
           userAddress,
         },
       });
+      console.log('category response==>>', response.data);
+
       dispatch({
         type: FETCH_CATEGORY_SUCCESS,
         payload: response.data.categories,

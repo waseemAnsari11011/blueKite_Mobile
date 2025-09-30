@@ -20,7 +20,7 @@ import CardProducts from '../../components/CardProducts';
 import SearchBar from '../../components/SearchBar';
 import CustomImageCarousal from '../../components/CustomImageCarousalLandscape';
 import ProductCard from '../../components/ProductCard';
-import {baseURL} from '../../utils/api';
+import {serverURL} from '../../utils/api'; // Import serverURL
 import {
   fetchRecentlyAddedProducts,
   updateRecentlyAddedProductsPage,
@@ -134,7 +134,7 @@ const HomeScreen = ({navigation}) => {
             elevation: 10,
           }}>
           <Image
-            source={{uri: `${baseURL}${item?.images[0]}`}}
+            source={{uri: `${serverURL}${item?.images[0]}`}} // Use serverURL here
             style={{width: 85, height: 85, borderRadius: 10}}
           />
           <Text
