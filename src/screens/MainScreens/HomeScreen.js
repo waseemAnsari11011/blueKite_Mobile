@@ -99,10 +99,8 @@ const HomeScreen = ({navigation}) => {
 
         // 4. Fetch all data that depends on user's location
         dispatch(fetchCategories(userAddress));
-        dispatch(
-          fetchRecentlyAddedProducts(1, 4, data.user.availableLocalities),
-        );
-        dispatch(fetchDiscountedProducts(1, 4, data.user.availableLocalities));
+        dispatch(fetchRecentlyAddedProducts(1, 4, userAddress));
+        dispatch(fetchDiscountedProducts(1, 4, userAddress));
       }
     };
 
