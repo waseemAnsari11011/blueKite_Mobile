@@ -17,7 +17,7 @@ import Icon from '../../components/Icons/Icon';
 import StickyButton from '../../components/stickyBottomCartBtn';
 import StickyProceedButton from '../../components/StickyProceed';
 import {useDispatch, useSelector} from 'react-redux';
-import api, {baseURL} from '../../utils/api';
+import api, {serverURL} from '../../utils/api';
 import calculateDiscountedPrice from '../../utils/calculateDiscountedPrice';
 import QuantityUpdater from '../../components/QuantityUpdater';
 import {clearCart} from '../../config/redux/actions/cartActions';
@@ -264,7 +264,7 @@ const CheckoutScreen = ({navigation}) => {
           )}
           {item?.images?.length !== 0 && (
             <Image
-              source={{uri: `${baseURL}${item?.images[0]}`}}
+              source={{uri: `${serverURL}${item?.images[0]}`}}
               style={summarystyles.productImage}
             />
           )}

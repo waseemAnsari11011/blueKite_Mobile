@@ -8,7 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import Icon from './Icons/Icon';
-import {baseURL} from '../utils/api';
+import {serverURL} from '../utils/api';
 import calculateDiscountedPrice from '../utils/calculateDiscountedPrice';
 
 const ProductCard = ({item}) => {
@@ -27,7 +27,7 @@ const ProductCard = ({item}) => {
             </TouchableOpacity> */}
       {item?.images?.length > 0 && (
         <Image
-          source={{uri: `${baseURL}${item?.images[0]}`}} // Replace with your image url
+          source={{uri: `${serverURL}${item?.images[0]}`}} // Replace with your image url
           style={styles.productImage}
         />
       )}

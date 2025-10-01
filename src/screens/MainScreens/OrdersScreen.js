@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -7,46 +7,62 @@ import {
   FlatList,
   SafeAreaView,
   Image,
-  Dimensions
+  Dimensions,
 } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import QuantityUpdater from '../../components/QuantityUpdater';
 import StickyCheckoutBtn from '../../components/StickyCheckoutBtn';
-import { baseURL } from '../../utils/api';
+import {serverURL} from '../../utils/api';
 import calculateDiscountedPrice from '../../utils/calculateDiscountedPrice';
 import Icon from '../../components/Icons/Icon';
-import { removeItem } from '../../config/redux/actions/cartActions';
+import {removeItem} from '../../config/redux/actions/cartActions';
 
 const windowWidth = Dimensions.get('window').width;
 
-const OrdersScreen = ({ navigation }) => {
-  const dispatch = useDispatch()
-  const { cartItems, timer } = useSelector(state => state.cart);
+const OrdersScreen = ({navigation}) => {
+  const dispatch = useDispatch();
+  const {cartItems, timer} = useSelector(state => state.cart);
 
   const totalPrice = cartItems?.reduce(
-    (total, item) => total + calculateDiscountedPrice(item.price, item.discount) * item.quantity,
+    (total, item) =>
+      total +
+      calculateDiscountedPrice(item.price, item.discount) * item.quantity,
     0,
   );
 
-  const handleDelete = (item) => {
-    dispatch(removeItem(item._id))
+  const handleDelete = item => {
+    dispatch(removeItem(item._id));
   };
 
-
-  const renderCartItem = ({ item, index }) => {
+  const renderCartItem = ({item, index}) => {
     return (
-      <View style={[styles.cartItem, cartItems.length - 1 === index && { marginBottom: 250 }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          {item?.images?.length === 0 && <Image
-            source={{ uri: `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM4sEG5g9GFcy4SUxbzWNzUTf1jMISTDZrTw&s` }} // Replace with your image url
-            style={styles.productImage}
-          />}
-          {item?.images?.length !== 0 && <Image source={{ uri: `${baseURL}${item?.images[0]}` }} style={styles.productImage} />}
+      <View
+        style={[
+          styles.cartItem,
+          cartItems.length - 1 === index && {marginBottom: 250},
+        ]}>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          {item?.images?.length === 0 && (
+            <Image
+              source={{
+                uri: `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM4sEG5g9GFcy4SUxbzWNzUTf1jMISTDZrTw&s`,
+              }} // Replace with your image url
+              style={styles.productImage}
+            />
+          )}
+          {item?.images?.length !== 0 && (
+            <Image
+              source={{uri: `${serverURL}${item?.images[0]}`}}
+              style={styles.productImage}
+            />
+          )}
           <View style={styles.detailsContainer}>
             <Text style={styles.productName}>{item.name}</Text>
             {/* <Text style={styles.productWeight}>100 g</Text> */}
             <View style={styles.priceContainer}>
-              <Text style={styles.discountedPrice}>₹{calculateDiscountedPrice(item.price, item.discount)}</Text>
+              <Text style={styles.discountedPrice}>
+                ₹{calculateDiscountedPrice(item.price, item.discount)}
+              </Text>
               <Text style={styles.originalPrice}>₹{item.price}</Text>
             </View>
             <Text style={styles.discountPercentage}>-{item.discount}%</Text>
@@ -58,7 +74,6 @@ const OrdersScreen = ({ navigation }) => {
             </View>
           </View>
         </View>
-
       </View>
     );
   };
@@ -68,7 +83,7 @@ const OrdersScreen = ({ navigation }) => {
       <View style={styles.emptyCart}>
         <Image
           source={require('../../assets/images/empty_cart.gif')}
-          style={{ height: 200, width: 200 }}
+          style={{height: 200, width: 200}}
         />
         <Text style={styles.emptyCartText}>Your cart is empty</Text>
       </View>
@@ -80,10 +95,8 @@ const OrdersScreen = ({ navigation }) => {
     // Place order logic here
   };
 
-
-
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F0F8FF50' }}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#F0F8FF50'}}>
       <View style={styles.container}>
         {cartItems?.length > 0 ? (
           <View style={styles.cartList}>
@@ -92,13 +105,17 @@ const OrdersScreen = ({ navigation }) => {
               renderItem={renderCartItem}
               keyExtractor={(item, index) => index.toString()}
             />
-
           </View>
         ) : (
           renderEmptyCart()
         )}
       </View>
-      {cartItems.length > 0 && <StickyCheckoutBtn total={totalPrice.toFixed(2)} navigation={navigation} />}
+      {cartItems.length > 0 && (
+        <StickyCheckoutBtn
+          total={totalPrice.toFixed(2)}
+          navigation={navigation}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -107,7 +124,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F0F8FF50',
-
   },
   cartList: {
     flex: 1,
@@ -120,12 +136,12 @@ const styles = StyleSheet.create({
     padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    backgroundColor: 'white'
+    backgroundColor: 'white',
   },
   title: {
     fontWeight: 'bold',
     color: 'black',
-    fontSize: 18
+    fontSize: 18,
   },
   price: {
     marginTop: 10,
@@ -190,16 +206,16 @@ const styles = StyleSheet.create({
   productName: {
     fontWeight: 'bold',
     color: 'black',
-    fontSize: 13
+    fontSize: 13,
   },
   productWeight: {
     color: '#666',
-    fontSize: 13
+    fontSize: 13,
   },
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    marginTop: 7
+    marginTop: 7,
   },
   discountedPrice: {
     color: 'red',
@@ -209,18 +225,18 @@ const styles = StyleSheet.create({
   originalPrice: {
     textDecorationLine: 'line-through',
     marginLeft: 8,
-    fontSize: 15
+    fontSize: 15,
   },
   discountPercentage: {
     color: 'green',
     marginTop: 2,
-    fontSize: 15
+    fontSize: 15,
   },
   addContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 10
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
   },
 
   addButtonText: {
@@ -233,8 +249,8 @@ const styles = StyleSheet.create({
     width: windowWidth / 3,
     height: windowWidth / 3,
     marginRight: 15,
-    resizeMode: "contain"
-  }
+    resizeMode: 'contain',
+  },
 });
 
 export default OrdersScreen;
