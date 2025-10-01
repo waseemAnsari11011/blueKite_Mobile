@@ -27,7 +27,7 @@ const ProductCard = ({item}) => {
             </TouchableOpacity> */}
       {item?.images?.length > 0 && (
         <Image
-          source={{uri: `${serverURL}${item?.images[0]}`}} // Replace with your image url
+          source={{uri: `${serverURL}/${item?.images[0]}`}} // Replace with your image url
           style={styles.productImage}
         />
       )}

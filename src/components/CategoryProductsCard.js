@@ -5,20 +5,20 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
-  TextInput
+  TextInput,
 } from 'react-native';
 import React from 'react';
 import Icon from './Icons/Icon';
 import AddToCartBtn from './AddToCartBtn';
-import { addToCart } from '../config/redux/actions/cartActions';
-import { useDispatch, useSelector } from 'react-redux';
+import {addToCart} from '../config/redux/actions/cartActions';
+import {useDispatch, useSelector} from 'react-redux';
 import QuantityUpdater from './QuantityUpdater';
-import { baseURL } from '../utils/api';
+import {baseURL} from '../utils/api';
 
 const windowWidth = Dimensions.get('window').width;
 
-const CategoryProductsCard = ({ item, onPressNavigation }) => {
-  const { cartItems } = useSelector(state => state.cart);
+const CategoryProductsCard = ({item, onPressNavigation}) => {
+  const {cartItems} = useSelector(state => state.cart);
   const dispatch = useDispatch();
 
   const existingItemIndex = cartItems.findIndex(i => i._id === item._id);
@@ -36,56 +36,65 @@ const CategoryProductsCard = ({ item, onPressNavigation }) => {
 
     // Check if both price and discount are valid numbers
     if (isNaN(priceNumber) || isNaN(discountNumber)) {
-      throw new Error('Invalid input: price and discount should be valid numbers');
+      throw new Error(
+        'Invalid input: price and discount should be valid numbers',
+      );
     }
 
     // Calculate the discounted price
-    const discountedPrice = priceNumber - (priceNumber * discountNumber / 100);
+    const discountedPrice = priceNumber - (priceNumber * discountNumber) / 100;
 
     // Return the discounted price as a string, rounded to 2 decimal places
     return discountedPrice.toFixed(2).toString();
   }
 
-
   return (
-
     <>
       <TouchableOpacity style={styles.container} onPress={onPressNavigation}>
-        {item?.images?.length === 0 && <Image
-          source={{ uri: `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM4sEG5g9GFcy4SUxbzWNzUTf1jMISTDZrTw&s` }} // Replace with your image url
-          style={styles.productImage}
-        />}
-        {item?.images?.length !== 0 && <Image source={{ uri: `${baseURL}${item?.images[0]}` }} style={styles.productImage} />}
+        {item?.images?.length === 0 && (
+          <Image
+            source={{
+              uri: `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM4sEG5g9GFcy4SUxbzWNzUTf1jMISTDZrTw&s`,
+            }} // Replace with your image url
+            style={styles.productImage}
+          />
+        )}
+        {item?.images?.length !== 0 && (
+          <Image
+            source={{uri: `${baseURL}/${item?.images[0]}`}}
+            style={styles.productImage}
+          />
+        )}
         <View style={styles.detailsContainer}>
           <Text style={styles.productName}>{item.name}</Text>
           {/* <Text style={styles.productWeight}>100 g</Text> */}
           <View style={styles.priceContainer}>
-            <Text style={styles.discountedPrice}>₹{calculateDiscountedPrice(item.price, item.discount)}</Text>
+            <Text style={styles.discountedPrice}>
+              ₹{calculateDiscountedPrice(item.price, item.discount)}
+            </Text>
             <Text style={styles.originalPrice}>₹{item.price}</Text>
           </View>
           <Text style={styles.discountPercentage}>-{item.discount}%</Text>
           <View style={styles.addContainer}>
-            {
-              item.quantity === 0 ?
-                <Text style={{ fontWeight: 'bold', color: 'red' }}>Currently unavailable</Text> :
-                (existingItemIndex === -1 ?
-                  <AddToCartBtn product={item} /> :
-                  <QuantityUpdater quantity={quantity} item={item} />
-                )
-            }
-
+            {item.quantity === 0 ? (
+              <Text style={{fontWeight: 'bold', color: 'red'}}>
+                Currently unavailable
+              </Text>
+            ) : existingItemIndex === -1 ? (
+              <AddToCartBtn product={item} />
+            ) : (
+              <QuantityUpdater quantity={quantity} item={item} />
+            )}
           </View>
         </View>
       </TouchableOpacity>
     </>
-
   );
 };
 
 export default CategoryProductsCard;
 
 const styles = StyleSheet.create({
-
   container: {
     flexDirection: 'row',
     backgroundColor: 'white',
@@ -96,25 +105,25 @@ const styles = StyleSheet.create({
     width: windowWidth / 3,
     height: windowWidth / 3,
     marginRight: 15,
-    resizeMode: "contain"
+    resizeMode: 'contain',
   },
   detailsContainer: {
     flex: 1,
-    padding: 15
+    padding: 15,
   },
   productName: {
     fontWeight: 'bold',
     color: 'black',
-    fontSize: 13
+    fontSize: 13,
   },
   productWeight: {
     color: '#666',
-    fontSize: 12
+    fontSize: 12,
   },
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    marginTop: 7
+    marginTop: 7,
   },
   discountedPrice: {
     color: 'red',
@@ -124,15 +133,15 @@ const styles = StyleSheet.create({
   originalPrice: {
     textDecorationLine: 'line-through',
     marginLeft: 15,
-    fontSize: 17
+    fontSize: 17,
   },
   discountPercentage: {
     color: 'green',
     marginTop: 2,
-    fontSize: 15
+    fontSize: 15,
   },
   addContainer: {
-    flexDirection: "row-reverse",
+    flexDirection: 'row-reverse',
   },
 
   addButtonText: {

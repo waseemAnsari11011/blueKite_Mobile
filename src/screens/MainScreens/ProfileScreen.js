@@ -45,7 +45,7 @@ const ProfileScreen = ({navigation}) => {
               {url ? (
                 <Image
                   style={styles.profileImage}
-                  source={{uri: `${baseURL}${url}`}}
+                  source={{uri: `${baseURL}/${url}`}}
                 />
               ) : (
                 <Image

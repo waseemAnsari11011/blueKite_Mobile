@@ -8,11 +8,12 @@ import Animated, {
   useAnimatedRef,
 } from 'react-native-reanimated';
 import Pagination from './Pagination';
-import { baseURL } from '../utils/api';
-
-
+import {serverURL} from '../utils/api';
 
 const CustomImageCarousal = ({data, autoPlay, pagination}) => {
+  console.log('banner data===>>>', serverURL);
+
+  console.log('banner data===>>>', data);
   const scrollViewRef = useAnimatedRef(null);
   const interval = useRef();
   const [isAutoPlay, setIsAutoPlay] = useState(autoPlay);
@@ -84,7 +85,10 @@ const CustomImageCarousal = ({data, autoPlay, pagination}) => {
           return (
             <View style={{width: SIZE}} key={index}>
               <Animated.View style={[styles.imageContainer, style]}>
-                <Image  source={{uri:`${baseURL}${item.image}`}} style={styles.image} />
+                <Image
+                  source={{uri: `${serverURL}/${item.image}`}}
+                  style={styles.image}
+                />
               </Animated.View>
             </View>
           );
