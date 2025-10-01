@@ -125,7 +125,7 @@ const CheckoutScreen = ({navigation}) => {
         setloading(false);
         dispatch(clearCart());
         Alert.alert('Order placed Successfully!');
-        navigation.navigate('Home');
+        navigation.navigate('Profile');
       })
       .catch(error => {
         console.log('error---->>>', error);
