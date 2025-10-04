@@ -13,7 +13,7 @@ import AddToCartBtn from './AddToCartBtn';
 import {addToCart} from '../config/redux/actions/cartActions';
 import {useDispatch, useSelector} from 'react-redux';
 import QuantityUpdater from './QuantityUpdater';
-import {baseURL} from '../utils/api';
+import {serverURL} from '../utils/api';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -61,7 +61,7 @@ const CategoryProductsCard = ({item, onPressNavigation}) => {
         )}
         {item?.images?.length !== 0 && (
           <Image
-            source={{uri: `${baseURL}/${item?.images[0]}`}}
+            source={{uri: `${serverURL}/${item?.images[0]}`}}
             style={styles.productImage}
           />
         )}
