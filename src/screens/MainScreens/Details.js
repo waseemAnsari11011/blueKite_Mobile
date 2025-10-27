@@ -66,7 +66,7 @@ const Details = ({route, navigation}) => {
   };
 
   const imagesData = images.map(item => ({
-    image: `${serverURL}/${item}`,
+    image: `${item}`,
   }));
 
   const renderItems = ({item}) => (

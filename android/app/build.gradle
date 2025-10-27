@@ -80,12 +80,12 @@ android {
         applicationId "com.bluekiteapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 15
-        versionName "1.6.3"
+        versionCode 20
+        versionName "1.6.4"
     }
     signingConfigs {
         release {
-               storeFile file('my-upload-key.keystore')
+                storeFile file('my-upload-key.keystore')
                 storePassword '123456' 
                 keyAlias 'my-upload-key' 
                 keyPassword '123456'  

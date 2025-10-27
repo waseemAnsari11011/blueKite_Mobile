@@ -132,7 +132,7 @@ const HomeScreen = ({navigation}) => {
             elevation: 10,
           }}>
           <Image
-            source={{uri: `${serverURL}/${item?.images[0]}`}} // Use serverURL here
+            source={{uri: `${item?.images[0]}`}} // Use serverURL here
             style={{width: 85, height: 85, borderRadius: 10}}
           />
           <Text
@@ -156,6 +156,8 @@ const HomeScreen = ({navigation}) => {
       <ProductCard item={item} />
     </TouchableOpacity>
   );
+
+  console.log('category==>>', category);
 
   const ListHeaderComponent = () => (
     <View style={{}}>

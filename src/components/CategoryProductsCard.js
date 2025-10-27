@@ -18,6 +18,7 @@ import {serverURL} from '../utils/api';
 const windowWidth = Dimensions.get('window').width;
 
 const CategoryProductsCard = ({item, onPressNavigation}) => {
+  console.log('recently added', item);
   const {cartItems} = useSelector(state => state.cart);
   const dispatch = useDispatch();
 
@@ -61,7 +62,7 @@ const CategoryProductsCard = ({item, onPressNavigation}) => {
         )}
         {item?.images?.length !== 0 && (
           <Image
-            source={{uri: `${serverURL}/${item?.images[0]}`}}
+            source={{uri: `${item?.images[0]}`}}
             style={styles.productImage}
           />
         )}
