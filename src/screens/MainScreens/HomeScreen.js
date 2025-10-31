@@ -179,7 +179,7 @@ const HomeScreen = ({navigation}) => {
             marginVertical: 5,
             color: '#000000',
           }}>
-          Explore Categories
+          Explore Vendors
         </Text>
         <ScrollView
           horizontal
