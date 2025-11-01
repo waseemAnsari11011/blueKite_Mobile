@@ -39,7 +39,45 @@ function PhoneSignIn({navigation}) {
     return Math.floor(1000 + Math.random() * 9000).toString(); // Generate a 4-digit OTP
   };
 
+  // --- ADD THIS NEW FUNCTION ---
+  const bypassLogin = async () => {
+    setLoading(true);
+    console.log('Bypassing OTP for special number: 8882202176');
+    try {
+      const body = {
+        phoneNumber: '8882202176',
+        uid: '8882202176_BYPASS', // Use a unique identifier for this bypass
+      };
+      const result = await dispatch(PhoneLogin(body));
+      if (result.success && result.user && !result.user.isRestricted) {
+        dispatch(saveData('token', result.token));
+        dispatch(saveData('user', result.user));
+        // Navigation should happen automatically from your Redux state listener
+      } else {
+        Alert.alert(
+          'Bypass Error',
+          'Failed to log in with the special number. Check server logs.',
+        );
+      }
+    } catch (error) {
+      console.error('Bypass login error:', error);
+      Alert.alert('Error', 'An error occurred during the bypass login.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  // --- END OF NEW FUNCTION ---
+
+  // --- UPDATE THIS FUNCTION ---
   const checkUserRestriction = async () => {
+    // --- START OF ADDED LOGIC ---
+    // Check for the special bypass number first
+    if (phoneNumber === '8882202176') {
+      await bypassLogin();
+      return; // Stop execution to prevent normal OTP flow
+    }
+    // --- END OF ADDED LOGIC ---
+
     setLoading(true);
     console.log('checkUserRestriction');
     try {
@@ -68,8 +106,11 @@ function PhoneSignIn({navigation}) {
           'Network error. Please check your internet connection.',
         );
       }
+      setLoading(false); // <-- Added this to stop loading on error
     }
+    // Note: setLoading(false) is handled by sendOtp() in the success case
   };
+  // --- END OF UPDATED FUNCTION ---
 
   const sendOtp = async () => {
     setLoading(true);
