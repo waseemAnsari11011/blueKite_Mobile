@@ -53,7 +53,7 @@ export const notificationListener = () => {
     });
 
   messaging().onMessage(async remoteMessage => {
-    console.log('foreground state:', remoteMessage);
+    console.log('foreground state::::::>', remoteMessage);
     alert(remoteMessage.notification.body);
   });
 };

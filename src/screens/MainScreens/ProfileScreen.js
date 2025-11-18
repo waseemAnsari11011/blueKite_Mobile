@@ -29,7 +29,7 @@ const ProfileScreen = ({navigation}) => {
   }
 
   const openLink = () => {
-    Linking.openURL('https://waizcom.netlify.app/');
+    Linking.openURL('https://ecarts.agency');
   };
 
   const handlePhoneCall = () => {
@@ -169,7 +169,7 @@ const ProfileScreen = ({navigation}) => {
         style={({pressed}) => [styles.footer, {opacity: pressed ? 0.7 : 1}]}>
         <Text style={styles.footerText}>BlueKite</Text>
         <View style={styles.developerLinkContainer}>
-          <Text style={styles.footerSubText}>Developed by Waizcom</Text>
+          <Text style={styles.footerSubText}>Developed by ecarts.agency</Text>
           <Icon.FontAwesome
             name="external-link"
             size={16}
