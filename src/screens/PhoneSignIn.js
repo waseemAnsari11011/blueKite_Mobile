@@ -72,7 +72,7 @@ function PhoneSignIn({navigation}) {
   const checkUserRestriction = async () => {
     // --- START OF ADDED LOGIC ---
     // Check for the special bypass number first
-    if (phoneNumber === '8882202177') {
+    if (phoneNumber === '8882202176') {
       await bypassLogin();
       return; // Stop execution to prevent normal OTP flow
     }

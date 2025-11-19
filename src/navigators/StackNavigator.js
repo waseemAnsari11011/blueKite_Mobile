@@ -29,10 +29,7 @@ const StackNavigator = () => {
   console.log('data?.user?.shippingAddresses->', data?.user?.shippingAddresses);
   const shippingData = data?.user?.shippingAddresses;
   const hasShippingAddress =
-    shippingData &&
-    (Array.isArray(shippingData)
-      ? shippingData.length > 0
-      : !!shippingData.addressLine1);
+    shippingData && shippingData.location.coordinates.length !== 0;
 
   return (
     <Stack.Navigator
