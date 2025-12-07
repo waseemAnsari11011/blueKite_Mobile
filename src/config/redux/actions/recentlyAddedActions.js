@@ -11,12 +11,12 @@ import {
 } from './types';
 
 export const fetchRecentlyAddedProducts =
-  (page, limit, userAddress) => async dispatch => {
+  (page, limit, userAddress, vendorIds) => async dispatch => {
     dispatch({type: FETCH_RECENTLY_ADDED_PRODUCTS_REQUEST});
     try {
       console.log('page, limit', page, limit);
       const response = await api.get(`/recentlyAddedProducts`, {
-        params: {page, limit, userAddress},
+        params: {page, limit, userAddress, vendorIds},
       });
       if (response.data.products.length === 0) {
         dispatch({type: REACHED_END_RECENTLY_ADDED_PRODUCTS});

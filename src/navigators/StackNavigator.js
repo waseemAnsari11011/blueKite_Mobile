@@ -5,6 +5,10 @@ import MainTabNavigator from './MainTabNavigator';
 import DrawerNavigator from './DrawerNavigator';
 import Details from '../screens/MainScreens/Details';
 import EditProfile from '../screens/MainScreens/Profile/EditProfile';
+import DiscountedVendorsScreen from '../screens/MainScreens/DiscountedVendorsScreen';
+
+import NewArrivalVendorsScreen from '../screens/MainScreens/NewArrivalVendorsScreen';
+
 import CategoryProducts from '../screens/MainScreens/CategoryProducts';
 import EditAddress from '../screens/MainScreens/Profile/EditAddress';
 import Notifications from '../screens/MainScreens/Profile/Notifications';
@@ -20,6 +24,7 @@ import OrderTacking from '../screens/MainScreens/orders/OrderTacking';
 import SubmitInquiry from '../screens/MainScreens/inquiry/Inquiry';
 import faqs from '../screens/MainScreens/faqs/Faqs';
 import Contactus from '../screens/MainScreens/contact/Contactus';
+import VendorDetails from '../screens/MainScreens/VendorDetails';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,7 +34,7 @@ const StackNavigator = () => {
   console.log('data?.user?.shippingAddresses->', data?.user?.shippingAddresses);
   const shippingData = data?.user?.shippingAddresses;
   const hasShippingAddress =
-    shippingData && shippingData.location.coordinates.length !== 0;
+    shippingData && shippingData?.location?.coordinates?.length > 0;
 
   return (
     <Stack.Navigator
@@ -72,9 +77,19 @@ const StackNavigator = () => {
         component={DiscountedProducts}
       />
       <Stack.Screen
+        name="DiscountedVendors"
+        options={{headerShown: true, title: 'Vendors on Sale'}}
+        component={DiscountedVendorsScreen}
+      />
+      <Stack.Screen
         name="New Arrivals"
         options={{headerShown: true}}
         component={RecentlyAddedProducts}
+      />
+      <Stack.Screen
+        name="NewArrivalVendors"
+        options={{headerShown: true, title: 'New Arrivals'}}
+        component={NewArrivalVendorsScreen}
       />
       <Stack.Screen
         name="Search Your Products"
@@ -110,6 +125,11 @@ const StackNavigator = () => {
         name="Contact us"
         options={{headerShown: true}}
         component={Contactus}
+      />
+      <Stack.Screen
+        name="VendorDetails"
+        options={{headerShown: true, title: 'Vendor Details'}}
+        component={VendorDetails}
       />
     </Stack.Navigator>
   );

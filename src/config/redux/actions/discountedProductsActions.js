@@ -11,12 +11,12 @@ import {
 } from './types';
 
 export const fetchDiscountedProducts =
-  (page, limit, userAddress) => async dispatch => {
+  (page, limit, userAddress, vendorIds) => async dispatch => {
     dispatch({type: FETCH_DISCOUNTED_PRODUCTS_REQUEST});
     try {
       const response = await api.get(`/onDiscountProducts`, {
         // Assuming this is the correct endpoint for discounted products
-        params: {page, limit, userAddress},
+        params: {page, limit, userAddress, vendorIds},
       });
       if (response.data.products.length === 0) {
         dispatch({type: REACHED_END_DISCOUNTED_PRODUCTS});

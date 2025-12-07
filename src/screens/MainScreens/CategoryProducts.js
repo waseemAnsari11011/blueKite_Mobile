@@ -30,7 +30,7 @@ const CategoryProducts = ({ navigation, route }) => {
 
   useEffect(() => {
     if (!reachedEnd && !loading) {
-      dispatch(fetchProductsByCategory(route.params?.categoryId, page, limit, data?.user.availableLocalities));
+      dispatch(fetchProductsByCategory(route.params?.categoryId, page, limit, data?.user.availableLocalities, route.params?.vendorId));
     }
   }, [page]);
 

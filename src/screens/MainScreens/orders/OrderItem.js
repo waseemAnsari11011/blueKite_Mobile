@@ -1,7 +1,46 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Card, Paragraph } from 'react-native-paper';
 import Icon from '../../../components/Icons/Icon';
+
+const CountdownTimer = ({ targetDate }) => {
+    const calculateTimeLeft = () => {
+        const difference = new Date(targetDate) - new Date();
+        let timeLeft = {};
+
+        if (difference > 0) {
+            timeLeft = {
+                minutes: Math.floor((difference / 1000 / 60) % 60),
+                seconds: Math.floor((difference / 1000) % 60),
+            };
+        }
+        return { timeLeft, difference };
+    };
+
+    const [time, setTime] = useState(calculateTimeLeft());
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setTime(calculateTimeLeft());
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [targetDate]);
+
+    if (time.difference <= 0) {
+        return (
+            <Paragraph style={{ color: 'green', fontWeight: 'bold', marginTop: 4 }}>
+                <Icon.FontAwesome name="clock-o" size={16} /> Arriving soon
+            </Paragraph>
+        );
+    }
+
+    return (
+        <Paragraph style={{ color: 'green', fontWeight: 'bold', marginTop: 4 }}>
+            <Icon.FontAwesome name="clock-o" size={16} /> Arriving in {time.timeLeft.minutes}m {time.timeLeft.seconds}s
+        </Paragraph>
+    );
+};
 
 const OrderItem = ({ order }) => {
 
@@ -33,11 +72,14 @@ const OrderItem = ({ order }) => {
                         <Paragraph style={[styles.orderStatus, { color: getStatusColor(vendorItem.orderStatus), fontWeight: 'bold' }]}>
                             <Icon.FontAwesome name="info-circle" size={16} /> Order Status: {vendorItem.orderStatus}
                         </Paragraph>
+                        {vendorItem.orderStatus === 'Processing' && vendorItem.estimatedDeliveryDate && (
+                            <CountdownTimer targetDate={vendorItem.estimatedDeliveryDate} />
+                        )}
 
 
                         {vendorItem.products.map((productItem) => (
                             <View key={productItem._id} style={styles.productContainer}>
-                                <Paragraph style={styles.productName}><Icon.FontAwesome name="cube" size={16} /> Product: {productItem.product.name}</Paragraph>
+                                <Paragraph style={styles.productName}><Icon.FontAwesome name="cube" size={16} /> Product: {productItem.product ? productItem.product.name : 'Product Unavailable'}</Paragraph>
                                 <Paragraph style={styles.productDetails}><Icon.FontAwesome name="sort-numeric-asc" size={16} /> Quantity: {productItem.quantity}</Paragraph>
                                 <Paragraph style={styles.productDetails}><Icon.FontAwesome name="dollar" size={16} /> Price: ₹{productItem.price}</Paragraph>
                                 <Paragraph style={styles.productDetails}><Icon.FontAwesome name="percent" size={16} /> Discount: {productItem.discount}%</Paragraph>

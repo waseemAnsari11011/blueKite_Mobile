@@ -1,38 +1,48 @@
 import api from '../../../utils/api';
-import { UPDATE_CUSTOMER_REQUEST, UPDATE_CUSTOMER_SUCCESS, UPDATE_CUSTOMER_FAILURE } from './types';
+import {
+  UPDATE_CUSTOMER_REQUEST,
+  UPDATE_CUSTOMER_SUCCESS,
+  UPDATE_CUSTOMER_FAILURE,
+} from './types';
 
 // Action creator with asynchronous API call
-export const updateCustomer = (token, customerId, formData) => async dispatch => {
-    dispatch({ type: UPDATE_CUSTOMER_REQUEST });
+export const updateCustomer =
+  (token, customerId, formData) => async dispatch => {
+    dispatch({type: UPDATE_CUSTOMER_REQUEST});
 
     try {
-        const response = await api.put(`/single-customer/${customerId}`, formData, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data',
-            },
-        });
+      const response = await api.put(
+        `/single-customer/${customerId}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
 
-        console.log("response.data-->>", response.data)
+      console.log('response.data-->>', response.data);
 
-        dispatch({ type: UPDATE_CUSTOMER_SUCCESS, payload: response.data });
-        return { success: true, user: response.data };
-
+      dispatch({type: UPDATE_CUSTOMER_SUCCESS, payload: response.data});
+      return {success: true, user: response.data};
     } catch (error) {
-        dispatch({ type: UPDATE_CUSTOMER_FAILURE, payload: error.message });
+      dispatch({type: UPDATE_CUSTOMER_FAILURE, payload: error.message});
     }
-};
+  };
 
 export const updateFcm = async (customerId, data) => {
-
-    // console.log(" updateFcm token-->>", data)
-    try {
-        const response = await api.put(`/update-fcm/${customerId}`, {fcmDeviceToken:data});
-        console.log("response.data fcm-->>", response.data, data);
-        return { success: true, user: response.data };
-    } catch (error) {
-        // Handle error here if needed
-        console.error('Error updating FCM token:', error);
-        return { success: false, error: error.message };
-    }r
+  // console.log(" updateFcm token-->>", data)
+  try {
+    const response = await api.put(`/update-fcm/${customerId}`, {
+      fcmDeviceToken: data,
+    });
+    // console.log("response.data fcm-->>", response.data, data);
+    return {success: true, user: response.data};
+  } catch (error) {
+    // Handle error here if needed
+    console.error('Error updating FCM token:', error);
+    return {success: false, error: error.message};
+  }
+  r;
 };

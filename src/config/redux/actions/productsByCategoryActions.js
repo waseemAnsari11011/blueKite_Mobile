@@ -9,12 +9,12 @@ import {
     REACHED_END_PRODUCTS_BY_CATEGORY
 } from './types';
 
-export const fetchProductsByCategory = (categoryId, page, limit, userLocation) => async (dispatch) => {
+export const fetchProductsByCategory = (categoryId, page, limit, userLocation, vendorId) => async (dispatch) => {
     dispatch({ type: FETCH_PRODUCTS_BY_CATEGORY_REQUEST });
     try {
-        console.log("categoryId, page, limit", categoryId, page, limit);
+        console.log("categoryId, page, limit, vendorId", categoryId, page, limit, vendorId);
         const response = await api.get(`/categories/${categoryId}/products`, {
-            params: { page, limit, userLocation },
+            params: { page, limit, userLocation, vendorId },
         });
         if (response.data.products.length === 0) {
             dispatch({ type: REACHED_END_PRODUCTS_BY_CATEGORY });

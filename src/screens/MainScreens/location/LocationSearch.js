@@ -146,22 +146,20 @@ const LocationSearch = ({navigation, route}) => {
     // Extract Lat/Lng directly from details
     const {lat, lng} = details.geometry.location;
 
-    if (!pincode) {
-      alert('Selected location does not have a valid pincode.');
-      googlePlacesRef.current?.clear();
-      setSelectedLocation(null);
-      return;
-    }
-
-    setSelectedLocation({
+    // Populate manual location state with whatever we found
+    setManualLocation({
       description: data.description,
-      pincode,
-      state,
-      country,
-      city,
-      lat, // Save lat
-      lng, // Save lng
+      pincode: pincode || '', // Allow empty pincode
+      state: state || '',
+      country: country || '',
+      city: city || '',
+      lat,
+      lng,
     });
+
+    // Switch to manual mode so user can edit/add details (like pincode)
+    setSearchLocation(false);
+    setSelectedLocation(null); // Clear selected location to show manual form
   };
 
   const handleManualLocationChange = (field, value) => {

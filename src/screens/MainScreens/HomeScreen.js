@@ -10,41 +10,26 @@ import {
   FlatList,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
-import Card from '../../components/Card';
 import {useDispatch, useSelector} from 'react-redux';
-import {addToCart} from '../../config/redux/actions/cartActions';
-
 import Loading from '../../components/Loading';
 import Icon from '../../components/Icons/Icon';
-import CardProducts from '../../components/CardProducts';
 import SearchBar from '../../components/SearchBar';
 import CustomImageCarousal from '../../components/CustomImageCarousalLandscape';
 import ProductCard from '../../components/ProductCard';
-import {serverURL} from '../../utils/api'; // Import serverURL
-import {
-  fetchRecentlyAddedProducts,
-  updateRecentlyAddedProductsPage,
-  resetRecentlyAddedProducts,
-} from '../../config/redux/actions/recentlyAddedActions';
-import {fetchCategories} from '../../config/redux/actions/categoryAction';
-import {
-  fetchDiscountedProducts,
-  updateDiscountedProductsPage,
-  resetDiscountedProducts,
-} from '../../config/redux/actions/discountedProductsActions';
+import {fetchRecentlyAddedProducts} from '../../config/redux/actions/recentlyAddedActions';
 import {getBanners} from '../../config/redux/actions/bannerActions';
 import {updateFcm} from '../../config/redux/actions/customerActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const {width} = Dimensions.get('window');
+import {fetchVendorsNearMe} from '../../config/redux/actions/vendorActions';
+import {fetchDiscountedProducts} from '../../config/redux/actions/discountedProductsActions';
 
 const HomeScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const {
-    loading: categoryLoading,
-    category,
-    error: categoryError,
-  } = useSelector(state => state.categories);
+    loading: vendorLoading,
+    vendors,
+    error: vendorError,
+  } = useSelector(state => state.vendors);
   const {
     loading: bannerLoading,
     banners,
@@ -58,10 +43,11 @@ const HomeScreen = ({navigation}) => {
     products: recentlyAddedProducts,
     error: recentlyAddedError,
   } = useSelector(state => state.recentlyAddedProducts);
+
   const {
-    loading: onDiscountLoading,
-    products: onDiscountProducts,
-    error: onDiscountError,
+    loading: discountedProductsLoading,
+    products: discountedProducts,
+    error: discountedProductsError,
   } = useSelector(state => state.discountedProducts);
 
   useEffect(() => {
@@ -84,44 +70,51 @@ const HomeScreen = ({navigation}) => {
     // This effect runs only when the user data becomes available.
     const initializeAppData = async () => {
       if (data && data.user) {
-        // 1. Update FCM token
-        const deviceToken = await AsyncStorage.getItem('deviceToken');
-        if (deviceToken) {
-          const deviceTokenData = JSON.parse(deviceToken);
-          updateFcm(data.user._id, deviceTokenData);
-        }
-
-        // 2. Fetch banners
-        dispatch(getBanners());
-
         // 3. Get user's primary shipping address
         const userAddress = data.user.shippingAddresses?.address;
 
         // 4. Fetch all data that depends on user's location
-        dispatch(fetchCategories(userAddress));
-        dispatch(fetchRecentlyAddedProducts(1, 4, userAddress));
-        dispatch(fetchDiscountedProducts(1, 4, userAddress));
+        if (
+          data.user.shippingAddresses?.location?.coordinates &&
+          data.user.shippingAddresses?.location?.coordinates.length > 0
+        ) {
+          const [long, lat] = data.user.shippingAddresses.location.coordinates;
+          dispatch(fetchVendorsNearMe(lat, long));
+        }
       }
     };
 
     initializeAppData();
-  }, [dispatch, data.user]); // Dependency on `data.user` ensures this runs only when user data is loaded.
+  }, [dispatch, data?.user]);
 
-  if (categoryError) {
-    return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text>{categoryError}</Text>
-      </View>
-    );
-  }
+  useEffect(() => {
+    if (vendors && vendors.length > 0) {
+      const vendorIds = vendors.map(v => v._id).join(',');
+      const userAddress = data?.user?.shippingAddresses?.address;
+      
+      dispatch(fetchDiscountedProducts(1, 4, userAddress, vendorIds));
+      dispatch(fetchRecentlyAddedProducts(1, 4, userAddress, vendorIds));
+    }
+  }, [dispatch, vendors, data?.user]);
 
-  const renderCategory = ({item}) => (
+
+
+
+
+  const renderProduct = ({item}) => (
+    <TouchableOpacity
+      style={{width: '48%', marginBottom: 10}}
+      onPress={() => navigation.navigate('Details', {product: item})}>
+      <ProductCard item={item} />
+    </TouchableOpacity>
+  );
+
+  const renderVendor = ({item}) => (
     <View>
       <TouchableOpacity
         onPress={() =>
-          navigation.navigate('CategoryProducts', {
-            categoryId: item._id,
-            categoryTitle: item.name,
+          navigation.navigate('VendorDetails', {
+            vendor: item,
           })
         }>
         <View
@@ -132,7 +125,12 @@ const HomeScreen = ({navigation}) => {
             elevation: 10,
           }}>
           <Image
-            source={{uri: `${item?.images[0]}`}} // Use serverURL here
+            source={{
+              uri:
+                item.shopImages && item.shopImages.length > 0
+                  ? item.shopImages[0]
+                  : 'https://via.placeholder.com/150',
+            }}
             style={{width: 85, height: 85, borderRadius: 10}}
           />
           <Text
@@ -148,16 +146,6 @@ const HomeScreen = ({navigation}) => {
       </TouchableOpacity>
     </View>
   );
-
-  const renderItems = ({item}) => (
-    <TouchableOpacity
-      style={{}}
-      onPress={() => navigation.navigate('Details', {product: item})}>
-      <ProductCard item={item} />
-    </TouchableOpacity>
-  );
-
-  console.log('category==>>', category);
 
   const ListHeaderComponent = () => (
     <View style={{}}>
@@ -189,13 +177,13 @@ const HomeScreen = ({navigation}) => {
           style={{marginHorizontal: -20}}>
           <FlatList
             contentContainerStyle={{alignSelf: 'flex-start'}}
-            numColumns={Math.ceil(category.length / 2)}
+            numColumns={Math.ceil(vendors.length / 2)}
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
-            data={category}
+            data={vendors}
             directionalLockEnabled={true}
             alwaysBounceVertical={false}
-            renderItem={renderCategory}
+            renderItem={renderVendor}
           />
         </ScrollView>
       </View>
@@ -232,9 +220,9 @@ const HomeScreen = ({navigation}) => {
       </View>
 
       <FlatList
-        data={onDiscountProducts}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={renderItems}
+        data={discountedProducts.slice(0, 4)}
+        keyExtractor={(item, index) => item._id}
+        renderItem={renderProduct}
         numColumns={2}
         columnWrapperStyle={{
           justifyContent: 'space-between',
@@ -273,16 +261,18 @@ const HomeScreen = ({navigation}) => {
           <Icon.AntDesign name="right" color="#1e90ff" size={13} />
         </TouchableOpacity>
       </View>
+
+
     </View>
   );
 
   return (
     <View style={{flex: 1}}>
-      {categoryLoading && <Loading />}
+      {vendorLoading && <Loading />}
       <FlatList
-        data={recentlyAddedProducts}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={renderItems}
+        data={recentlyAddedProducts.slice(0, 4)}
+        keyExtractor={(item, index) => item._id}
+        renderItem={renderProduct}
         ListHeaderComponent={ListHeaderComponent}
         numColumns={2}
         columnWrapperStyle={{

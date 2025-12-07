@@ -33,13 +33,15 @@ const DiscountedProducts = ({navigation, route}) => {
   const {loading, products, error, page, limit, reachedEnd} = useSelector(
     state => state.discountedProducts,
   );
+  const {vendors} = useSelector(state => state.vendors);
+  const vendorIds = vendors?.map(v => v._id).join(',');
 
   useEffect(() => {
     if (!reachedEnd && !loading) {
       if (page === 1) {
         dispatch(resetDiscountedProducts());
       }
-      dispatch(fetchDiscountedProducts(page, limit, userAddress));
+      dispatch(fetchDiscountedProducts(page, limit, userAddress, vendorIds));
     }
   }, [page]);
 
@@ -47,7 +49,7 @@ const DiscountedProducts = ({navigation, route}) => {
   useEffect(() => {
     return () => {
       dispatch(resetDiscountedProducts());
-      dispatch(fetchDiscountedProducts(1, 4, userAddress));
+      dispatch(fetchDiscountedProducts(1, 4, userAddress, vendorIds));
     };
   }, [dispatch]);
 

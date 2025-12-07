@@ -26,6 +26,9 @@ const ManualLocationSearch = ({manualLocation, handleManualLocationChange}) => {
 
   useEffect(() => {
     const getCurrentLocation = async () => {
+      if (manualLocation.description) {
+        return;
+      }
       const hasPermission = await requestLocationPermission();
       if (!hasPermission) {
         Alert.alert(

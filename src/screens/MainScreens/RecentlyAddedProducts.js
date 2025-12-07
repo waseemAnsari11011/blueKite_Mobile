@@ -32,13 +32,15 @@ const RecentlyAddedProducts = ({navigation, route}) => {
   const {loading, products, error, page, limit, reachedEnd} = useSelector(
     state => state.recentlyAddedProducts,
   );
+  const {vendors} = useSelector(state => state.vendors);
+  const vendorIds = vendors?.map(v => v._id).join(',');
 
   useEffect(() => {
     if (!reachedEnd && !loading) {
       if (page === 1) {
         dispatch(resetRecentlyAddedProducts());
       }
-      dispatch(fetchRecentlyAddedProducts(page, limit, userAddress));
+      dispatch(fetchRecentlyAddedProducts(page, limit, userAddress, vendorIds));
     }
   }, [page]);
 
@@ -46,7 +48,7 @@ const RecentlyAddedProducts = ({navigation, route}) => {
   useEffect(() => {
     return () => {
       dispatch(resetRecentlyAddedProducts());
-      dispatch(fetchRecentlyAddedProducts(1, 4, userAddress));
+      dispatch(fetchRecentlyAddedProducts(1, 4, userAddress, vendorIds));
     };
   }, [dispatch]);
 
