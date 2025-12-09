@@ -7,9 +7,9 @@ import firebase from '@react-native-firebase/app';
 import {PaperProvider} from 'react-native-paper';
 import {
   requestUserPermission,
-  getToken,
+  GetFCMToken as getToken,
   notificationListener,
-} from './firebaseMessaging';
+} from './src/utils/pushNotification';
 import {PermissionsAndroid, Button} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import crashlytics from '@react-native-firebase/crashlytics';

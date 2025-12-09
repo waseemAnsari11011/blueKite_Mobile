@@ -7,6 +7,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {loadData} from '../config/redux/actions/storageActions';
 import SplashScreen from '../components/SplashScreen';
 
+import {navigationRef} from '../utils/NavigationService';
+import {checkInitialNotification} from '../utils/pushNotification';
+
 const RootNavigator = () => {
   const [isLoading, setIsLoading] = React.useState(true);
   useEffect(() => {
@@ -18,8 +21,6 @@ const RootNavigator = () => {
   const dispatch = useDispatch();
   const {data} = useSelector(state => state?.local);
 
-
-
   useEffect(() => {
     const loadLocalData = async () => {
       await dispatch(loadData('user'));
@@ -27,8 +28,16 @@ const RootNavigator = () => {
     loadLocalData();
   }, []);
 
+  // Check for initial notification when app is ready and user is logged in
+  useEffect(() => {
+    if (!isLoading && data?.user) {
+      console.log('RootNavigator: App ready, calling checkInitialNotification');
+      checkInitialNotification();
+    }
+  }, [isLoading, data?.user]);
+
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       {isLoading ? (
         <SplashScreen />
       ) : data?.user ? (

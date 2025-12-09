@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
+import * as NavigationService from './NavigationService';
+import api from './api';
 
 export async function requestUserPermission() {
   const authStatus = await messaging().requestPermission();
@@ -29,28 +31,68 @@ export async function GetFCMToken() {
   }
 }
 
+const handleNotificationNavigation = async remoteMessage => {
+  console.log('handleNotificationNavigation:', remoteMessage?.data);
+  if (remoteMessage?.data?.type === 'product_offer' && remoteMessage?.data?.productId) {
+    try {
+      console.log('Fetching product:', remoteMessage.data.productId);
+      const response = await api.get(
+        `/single-product/${remoteMessage.data.productId}`,
+      );
+      console.log('Product fetch response:', response.data);
+      if (response.data && response.data.product) {
+        console.log('Navigating to Details with product');
+        NavigationService.navigate('Details', {
+          product: response.data.product,
+        });
+      } else {
+        console.log('Product not found in response');
+      }
+    } catch (error) {
+      console.log('Error fetching product for notification:', error);
+    }
+  } else {
+    console.log('Notification type is not product_offer or missing productId');
+  }
+};
+
+export const checkInitialNotification = async () => {
+  console.log('checkInitialNotification called');
+  try {
+    const remoteMessage = await messaging().getInitialNotification();
+    console.log('getInitialNotification result:', remoteMessage);
+    
+    if (remoteMessage) {
+      console.log(
+        'Notification caused app to open from quit state (notification):',
+        remoteMessage.notification,
+      );
+      console.log(
+        'Notification caused app to open from quit state (data):',
+        remoteMessage.data,
+      );
+      
+      console.log('Calling handleNotificationNavigation...');
+      await handleNotificationNavigation(remoteMessage);
+      console.log('handleNotificationNavigation returned');
+    } else {
+      console.log('No initial notification found');
+    }
+  } catch (error) {
+    console.log('Error checking initial notification:', error);
+  }
+};
+
 export const notificationListener = () => {
   console.log('notificationListener');
-  // Assume a message-notification contains a "type" property in the data payload of the screen to open
 
   messaging().onNotificationOpenedApp(remoteMessage => {
     console.log(
       'Notification caused app to open from background state:',
       remoteMessage.notification,
     );
+    handleNotificationNavigation(remoteMessage);
   });
-
-  // Check whether an initial notification is available
-  messaging()
-    .getInitialNotification()
-    .then(remoteMessage => {
-      if (remoteMessage) {
-        console.log(
-          'Notification caused app to open from quit state:',
-          remoteMessage.notification,
-        );
-      }
-    });
 
   messaging().onMessage(async remoteMessage => {
     console.log('foreground state::::::>', remoteMessage);

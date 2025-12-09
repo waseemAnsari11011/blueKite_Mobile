@@ -140,7 +140,7 @@ const HomeScreen = ({navigation}) => {
               fontWeight: '400',
               color: '#000000',
             }}>
-            {item.name}
+            {item.vendorInfo?.businessName || item.name}
           </Text>
         </View>
       </TouchableOpacity>

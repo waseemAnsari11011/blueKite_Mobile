@@ -80,7 +80,12 @@ const VendorDetails = ({ route, navigation }) => {
             style={styles.vendorImage}
         />
         <View style={styles.vendorInfo}>
-            <Text style={styles.vendorName}>{vendor.name}</Text>
+            <Text style={styles.vendorName}>
+              {vendor.vendorInfo?.businessName || vendor.name}
+            </Text>
+            {vendor.vendorInfo?.businessName && (
+              <Text style={styles.businessName}>{vendor.name}</Text>
+            )}
             <Text style={styles.vendorAddress}>{vendor.vendorInfo?.address?.addressLine1}, {vendor.vendorInfo?.address?.city}</Text>
         </View>
       </View>
