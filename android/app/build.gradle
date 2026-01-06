@@ -79,7 +79,7 @@ android {
         applicationId "com.bluekiteapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 30
+        versionCode 35
         versionName "1.6.6"
     }
     signingConfigs {

@@ -102,14 +102,19 @@ const CheckoutScreen = ({navigation}) => {
     const vendorMap = {};
 
     cartItems.forEach(item => {
-      if (!vendorMap[item.vendor]) {
-        vendorMap[item.vendor] = {
-          vendor: item.vendor,
+      const vendorId =
+        typeof item.vendor === 'object' && item.vendor !== null
+          ? item.vendor._id
+          : item.vendor;
+
+      if (!vendorMap[vendorId]) {
+        vendorMap[vendorId] = {
+          vendor: vendorId,
           products: [],
           orderStatus: 'Pending',
         };
       }
-      vendorMap[item.vendor].products.push({
+      vendorMap[vendorId].products.push({
         product: item._id,
         quantity: item.quantity,
         price: item.price,
@@ -149,14 +154,19 @@ const CheckoutScreen = ({navigation}) => {
     const vendorMap = {};
 
     cartItems.forEach(item => {
-      if (!vendorMap[item.vendor]) {
-        vendorMap[item.vendor] = {
-          vendor: item.vendor,
+      const vendorId =
+        typeof item.vendor === 'object' && item.vendor !== null
+          ? item.vendor._id
+          : item.vendor;
+
+      if (!vendorMap[vendorId]) {
+        vendorMap[vendorId] = {
+          vendor: vendorId,
           products: [],
           orderStatus: 'Pending',
         };
       }
-      vendorMap[item.vendor].products.push({
+      vendorMap[vendorId].products.push({
         product: item._id,
         quantity: item.quantity,
         price: item.price,

@@ -10,6 +10,7 @@ import {
   GetFCMToken as getToken,
   notificationListener,
 } from './src/utils/pushNotification';
+import {checkForUpdates} from './src/utils/checkUpdate';
 import {PermissionsAndroid, Button} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import crashlytics from '@react-native-firebase/crashlytics';
@@ -34,6 +35,7 @@ const App = () => {
     };
 
     setupMessaging();
+    checkForUpdates();
   }, []);
 
   return (
