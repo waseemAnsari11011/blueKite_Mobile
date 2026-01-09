@@ -5,7 +5,6 @@ import {useSelector} from 'react-redux';
 
 const Notifications = ({navigation}) => {
   const {orderStatus} = useSelector(state => state.records);
-  console.log('orderStatus', orderStatus);
   return (
     <>
       <CustomHeader navigation={navigation} title="Notifications" />

@@ -61,20 +61,35 @@ const OrderItem = ({order}) => {
     }
   };
 
-  console.log('order', order._id);
-
   return (
     <Card style={styles.orderContainer}>
       <Card.Content>
         <Paragraph style={styles.orderId}>
-          <Icon.FontAwesome name="barcode" size={16} /> Order ID: {order.orderId}
+          <Icon.FontAwesome name="barcode" size={16} /> Order ID:{' '}
+          {order.orderId}
         </Paragraph>
         <Paragraph style={styles.orderDate}>
-          <Icon.FontAwesome name="calendar" size={16} /> <Text style={{fontWeight: 'bold'}}>Date:</Text>{" "}
+          <Icon.FontAwesome name="calendar" size={16} />{' '}
+          <Text style={{fontWeight: 'bold'}}>Date:</Text>{' '}
           {(() => {
             const d = new Date(order.createdAt);
-            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            const dateStr = `${d.getDate().toString().padStart(2, '0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
+            const months = [
+              'Jan',
+              'Feb',
+              'Mar',
+              'Apr',
+              'May',
+              'Jun',
+              'Jul',
+              'Aug',
+              'Sep',
+              'Oct',
+              'Nov',
+              'Dec',
+            ];
+            const dateStr = `${d.getDate().toString().padStart(2, '0')} ${
+              months[d.getMonth()]
+            } ${d.getFullYear()}`;
             let hours = d.getHours();
             const minutes = d.getMinutes().toString().padStart(2, '0');
             const ampm = hours >= 12 ? 'PM' : 'AM';
